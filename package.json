@@ -1,0 +1,30 @@
+{
+  "name": "gogo-mvp",
+  "version": "1.0.0",
+  "description": "GOGO leverages fan tokens to boost odds and turn losses into value through innovative staking mechanisms.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "deploy:local": "npx hardhat run scripts/deploy.js --network hardhat",
+    "deploy:testnet": "npx hardhat run scripts/deploy-quick.js --network chilizTestnet",
+    "start:backend": "cd backend && node server.js",
+    "start:frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "clean": "npx hardhat clean && rm -rf node_modules */node_modules"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^6.0.0",
+    "@openzeppelin/contracts": "^5.3.0",
+    "concurrently": "^9.2.0",
+    "hardhat": "^2.25.0"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.0"
+  }
+}
