@@ -319,6 +319,7 @@ export default function ProfilePage() {
             </TabsList>
 
             <TabsContent value="bets" className="mt-6">
+
               <div className="relative">
                 <div className="absolute inset-0 bg-gray-100/40 backdrop-blur-sm transform skew-y-1 rounded-lg"></div>
                 <div className="absolute inset-0 bg-gray-50/30 border border-gray-200/40 transform -skew-y-1 rounded-lg"></div>
@@ -361,6 +362,7 @@ export default function ProfilePage() {
                                 </Badge>
                               </div>
                               <p className="text-sm text-white/60">{formatTimestamp(bet.timestamp)}</p>
+
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                               <div>

@@ -16,17 +16,17 @@ export default function BettingPage() {
   const [betCurrency, setBetCurrency] = useState("") // Will be set when match is selected
   const [toast, setToast] = useState(null)
   const [isPlacingBet, setIsPlacingBet] = useState(false)
-  
-  const { 
-    isConnected, 
-    account, 
-    balance, 
-    chainId, 
-    connectWallet, 
-    switchToLocalhost, 
+
+  const {
+    isConnected,
+    account,
+    balance,
+    chainId,
+    connectWallet,
+    switchToChilizTestnet,
     placeBet: placeBetContract,
     getUserBets,
-    getUserFreebets 
+    getUserFreebets
   } = useWeb3()
 
   // Toast functions
@@ -44,8 +44,8 @@ export default function BettingPage() {
 
   // Check if on correct network
   useEffect(() => {
-    if (isConnected && chainId && chainId !== 31337) {
-      showToast("warning", "Please switch to Localhost Hardhat network for betting")
+    if (isConnected && chainId && chainId !== 88882) {
+      showToast("warning", "Please switch to Chiliz Testnet for betting")
     }
   }, [isConnected, chainId])
 
@@ -59,10 +59,10 @@ export default function BettingPage() {
   // Helper function to get current odds based on currency and team selection
   const getCurrentOdds = () => {
     if (!selectedMatch || !selectedTeam) return 0
-    
+
     const isHome = selectedTeam === "home"
     const isUsingTeamToken = betCurrency === (isHome ? selectedMatch.homeFanToken : selectedMatch.awayFanToken)
-    
+
     if (isUsingTeamToken) {
       return isHome ? selectedMatch.homeBoostedOdds : selectedMatch.awayBoostedOdds
     } else {
@@ -140,10 +140,10 @@ export default function BettingPage() {
       return
     }
 
-    if (chainId !== 31337) {
-      showToast("warning", "Please switch to Localhost Hardhat network")
+    if (chainId !== 88882) {
+      showToast("warning", "Please switch to Chiliz Testnet")
       try {
-        await switchToLocalhost()
+        await switchToChilizTestnet()
         return
       } catch (error) {
         showToast("error", "Failed to switch network")
@@ -175,7 +175,7 @@ export default function BettingPage() {
 
       const isFanToken = betCurrency !== "CHZ"
       let tokenAddress = undefined
-      
+
       if (isFanToken) {
         if (betCurrency === "PSG") {
           tokenAddress = PSG_TOKEN_ADDRESS
@@ -183,7 +183,7 @@ export default function BettingPage() {
           tokenAddress = BARCA_TOKEN_ADDRESS
         }
       }
-      
+
       const betData = {
         amount: betAmount,
         isFanToken,
@@ -193,17 +193,17 @@ export default function BettingPage() {
       }
 
       const tx = await placeBetContract(betData)
-      
+
       showToast("warning", `Transaction submitted! Hash: ${tx.hash.slice(0, 10)}...`)
 
       // Wait for transaction confirmation
       const receipt = await tx.wait()
-      
+
       if (receipt.status === 1) {
-        showToast("success", 
+        showToast("success",
           `Bet placed successfully! ${betAmount} ${betCurrency} on ${selectedTeam === "home" ? selectedMatch.homeTeam : selectedMatch.awayTeam}`
         )
-        
+
         // Reset form
         setBetAmount("")
         setSelectedTeam("")
@@ -214,7 +214,7 @@ export default function BettingPage() {
       }
     } catch (error: any) {
       console.error("Error placing bet:", error)
-      
+
       if (error.code === 4001) {
         showToast("warning", "Transaction cancelled by user")
       } else if (error.message?.includes("insufficient funds")) {
@@ -267,17 +267,16 @@ export default function BettingPage() {
           exit={{ opacity: 0, y: -50, x: "-50%" }}
           className="fixed top-4 left-1/2 z-50 min-w-80"
         >
-          <div className={`flex items-center p-4 rounded-lg backdrop-blur-sm border-l-4 shadow-lg ${
-            toast.type === "success" 
-              ? "bg-green-500/90 border-green-400 text-white" 
-              : toast.type === "error" 
+          <div className={`flex items-center p-4 rounded-lg backdrop-blur-sm border-l-4 shadow-lg ${toast.type === "success"
+            ? "bg-green-500/90 border-green-400 text-white"
+            : toast.type === "error"
               ? "bg-red-500/90 border-red-400 text-white"
-              : "bg-orange-500/90 border-orange-400 text-white"
-          }`} style={{
-            backgroundColor: toast.type === "success" ? 'rgba(34, 197, 94, 0.9)' : 
-                            toast.type === "error" ? 'rgba(239, 68, 68, 0.9)' : 
-                            'rgba(250, 1, 77, 0.9)'
-          }}>
+              : "bg-green-500/90 border-green-400 text-white"
+            }`} style={{
+              backgroundColor: toast.type === "success" ? 'rgba(34, 197, 94, 0.9)' :
+                toast.type === "error" ? 'rgba(239, 68, 68, 0.9)' :
+                  'rgba(34, 197, 94, 0.9)'
+            }}>
             <div className="mr-3">
               {toast.type === "success" && <CheckCircle className="w-5 h-5" />}
               {toast.type === "error" && <XCircle className="w-5 h-5" />}
@@ -309,6 +308,7 @@ export default function BettingPage() {
             {/* Profile Button */}
             {isConnected && (
               <Link href="/profile">
+
                 <div className="relative">
                   <div className="absolute inset-0 transform skew-x-2 rounded-lg" style={{ backgroundColor: '#FA014D' }}></div>
                   <Button 
@@ -338,9 +338,8 @@ export default function BettingPage() {
               {matches.map((match) => (
                 <motion.div key={match.id} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <div
-                    className={`relative cursor-pointer transition-all duration-300 ${
-                      selectedMatch?.id === match.id ? "transform scale-105" : ""
-                    }`}
+                    className={`relative cursor-pointer transition-all duration-300 ${selectedMatch?.id === match.id ? "transform scale-105" : ""
+                      }`}
                     onClick={() => setSelectedMatch(match)}
                   >
                     <div className="absolute inset-0 bg-gray-100/80 backdrop-blur-sm transform skew-y-1 rounded-lg"></div>
@@ -371,8 +370,8 @@ export default function BettingPage() {
                         <div className="text-center relative">
                           <div className="w-12 h-12 mx-auto mb-2 bg-white rounded-full flex items-center justify-center overflow-hidden">
                             {match.homeLogo ? (
-                              <img 
-                                src={match.homeLogo} 
+                              <img
+                                src={match.homeLogo}
                                 alt={match.homeTeam}
                                 className="w-8 h-8 object-contain"
                                 onError={(e) => {
@@ -381,7 +380,7 @@ export default function BettingPage() {
                                 }}
                               />
                             ) : null}
-                            <span 
+                            <span
                               className="text-sm font-bold text-black"
                               style={{ display: match.homeLogo ? 'none' : 'block' }}
                             >
@@ -410,8 +409,8 @@ export default function BettingPage() {
                         <div className="text-center relative">
                           <div className="w-12 h-12 mx-auto mb-2 bg-white rounded-full flex items-center justify-center overflow-hidden">
                             {match.awayLogo ? (
-                              <img 
-                                src={match.awayLogo} 
+                              <img
+                                src={match.awayLogo}
                                 alt={match.awayTeam}
                                 className="w-8 h-8 object-contain"
                                 onError={(e) => {
@@ -420,7 +419,7 @@ export default function BettingPage() {
                                 }}
                               />
                             ) : null}
-                            <span 
+                            <span
                               className="text-sm font-bold text-black"
                               style={{ display: match.awayLogo ? 'none' : 'block' }}
                             >
@@ -489,11 +488,10 @@ export default function BettingPage() {
                     </label>
                     <div className="grid grid-cols-3 gap-3">
                       <button
-                        className={`relative p-4 border-2 transition-all duration-300 rounded-lg ${
-                          betCurrency === "CHZ"
-                            ? "transform scale-105"
-                            : "border-white/40 bg-white/20"
-                        }`}
+                        className={`relative p-4 border-2 transition-all duration-300 rounded-lg ${betCurrency === "CHZ"
+                          ? "transform scale-105"
+                          : "border-white/40 bg-white/20"
+                          }`}
                         style={{
                           borderColor: betCurrency === "CHZ" ? '#FA014D' : undefined,
                           backgroundColor: betCurrency === "CHZ" ? 'rgba(250, 1, 77, 0.2)' : undefined
@@ -508,11 +506,10 @@ export default function BettingPage() {
                       </button>
 
                       <button
-                        className={`relative p-4 border-2 transition-all duration-300 rounded-lg ${
-                          betCurrency === selectedMatch.homeFanToken
-                            ? "transform scale-105"
-                            : "border-white/40 bg-white/20"
-                        }`}
+                        className={`relative p-4 border-2 transition-all duration-300 rounded-lg ${betCurrency === selectedMatch.homeFanToken
+                          ? "transform scale-105"
+                          : "border-white/40 bg-white/20"
+                          }`}
                         style={{
                           borderColor: betCurrency === selectedMatch.homeFanToken ? '#FA014D' : undefined,
                           backgroundColor: betCurrency === selectedMatch.homeFanToken ? 'rgba(250, 1, 77, 0.2)' : undefined
@@ -532,11 +529,10 @@ export default function BettingPage() {
                       </button>
 
                       <button
-                        className={`relative p-4 border-2 transition-all duration-300 rounded-lg ${
-                          betCurrency === selectedMatch.awayFanToken
-                            ? "transform scale-105"
-                            : "border-white/40 bg-white/20"
-                        }`}
+                        className={`relative p-4 border-2 transition-all duration-300 rounded-lg ${betCurrency === selectedMatch.awayFanToken
+                          ? "transform scale-105"
+                          : "border-white/40 bg-white/20"
+                          }`}
                         style={{
                           borderColor: betCurrency === selectedMatch.awayFanToken ? '#FA014D' : undefined,
                           backgroundColor: betCurrency === selectedMatch.awayFanToken ? 'rgba(250, 1, 77, 0.2)' : undefined
@@ -572,15 +568,14 @@ export default function BettingPage() {
                             </div>
                           </div>
                         )}
-                        
+
                         <button
-                          className={`relative p-4 border-2 transition-all duration-300 w-full ${
-                            selectedTeam === "home"
-                              ? "transform scale-105 bg-white/30"
-                              : "border-white/40 bg-white/20"
-                          }`}
+                          className={`relative p-4 border-2 transition-all duration-300 w-full ${selectedTeam === "home"
+                            ? "transform scale-105 bg-white/30"
+                            : "border-white/40 bg-white/20"
+                            }`}
                           onClick={() => setSelectedTeam("home")}
-                          style={{ 
+                          style={{
                             clipPath: "polygon(0 0, 90% 0, 100% 100%, 10% 100%)",
                             borderColor: selectedTeam === "home" ? '#FA014D' : undefined,
                             backgroundColor: selectedTeam === "home" ? 'rgba(250, 1, 77, 0.2)' : undefined
@@ -589,8 +584,8 @@ export default function BettingPage() {
                           <div className="text-center">
                             <div className="w-8 h-8 mx-auto mb-2 bg-white rounded-full flex items-center justify-center overflow-hidden">
                               {selectedMatch.homeLogo ? (
-                                <img 
-                                  src={selectedMatch.homeLogo} 
+                                <img
+                                  src={selectedMatch.homeLogo}
                                   alt={selectedMatch.homeTeam}
                                   className="w-6 h-6 object-contain"
                                   onError={(e) => {
@@ -599,7 +594,7 @@ export default function BettingPage() {
                                   }}
                                 />
                               ) : null}
-                              <span 
+                              <span
                                 className="text-xs font-bold text-black"
                                 style={{ display: selectedMatch.homeLogo ? 'none' : 'block' }}
                               >
@@ -623,15 +618,14 @@ export default function BettingPage() {
                             </div>
                           </div>
                         )}
-                        
+
                         <button
-                          className={`relative p-4 border-2 transition-all duration-300 w-full ${
-                            selectedTeam === "away"
-                              ? "transform scale-105 bg-white/30"
-                              : "border-white/40 bg-white/20"
-                          }`}
+                          className={`relative p-4 border-2 transition-all duration-300 w-full ${selectedTeam === "away"
+                            ? "transform scale-105 bg-white/30"
+                            : "border-white/40 bg-white/20"
+                            }`}
                           onClick={() => setSelectedTeam("away")}
-                          style={{ 
+                          style={{
                             clipPath: "polygon(10% 0, 100% 0, 90% 100%, 0% 100%)",
                             borderColor: selectedTeam === "away" ? '#FA014D' : undefined,
                             backgroundColor: selectedTeam === "away" ? 'rgba(250, 1, 77, 0.2)' : undefined
@@ -640,8 +634,8 @@ export default function BettingPage() {
                           <div className="text-center">
                             <div className="w-8 h-8 mx-auto mb-2 bg-white rounded-full flex items-center justify-center overflow-hidden">
                               {selectedMatch.awayLogo ? (
-                                <img 
-                                  src={selectedMatch.awayLogo} 
+                                <img
+                                  src={selectedMatch.awayLogo}
                                   alt={selectedMatch.awayTeam}
                                   className="w-6 h-6 object-contain"
                                   onError={(e) => {
@@ -650,7 +644,7 @@ export default function BettingPage() {
                                   }}
                                 />
                               ) : null}
-                              <span 
+                              <span
                                 className="text-xs font-bold text-black"
                                 style={{ display: selectedMatch.awayLogo ? 'none' : 'block' }}
                               >
@@ -679,7 +673,7 @@ export default function BettingPage() {
                         value={betAmount}
                         onChange={(e) => setBetAmount(e.target.value)}
                         className="bg-white/90 backdrop-blur-sm border-2 h-14 text-lg text-black placeholder:text-black/60 font-mono rounded-lg"
-                        style={{ 
+                        style={{
                           borderColor: '#FA014D'
                         }}
                       />
@@ -698,13 +692,13 @@ export default function BettingPage() {
                       <div className="relative bg-white/30 backdrop-blur-sm p-4 border-l-4" style={{ borderLeftColor: '#FA014D' }}>
                         <div className="space-y-3">
                           {/* Boosted odds indicator */}
-                          {((selectedTeam === "home" && betCurrency === selectedMatch.homeFanToken) || 
+                          {((selectedTeam === "home" && betCurrency === selectedMatch.homeFanToken) ||
                             (selectedTeam === "away" && betCurrency === selectedMatch.awayFanToken)) && (
-                            <div className="bg-green-500 text-white px-3 py-1 rounded-full text-center font-bold text-sm">
-                              🚀 BOOSTED ODDS ACTIVE! Higher payout with team token!
-                            </div>
-                          )}
-                          
+                              <div className="bg-green-500 text-white px-3 py-1 rounded-full text-center font-bold text-sm">
+                                🚀 BOOSTED ODDS ACTIVE! Higher payout with team token!
+                              </div>
+                            )}
+
                           <div className="flex justify-between items-center">
                             <span className="text-black/80 font-mono text-sm">POTENTIAL WIN:</span>
                             <div className="text-right">
@@ -739,18 +733,18 @@ export default function BettingPage() {
                     <Button
                       onClick={isConnected ? placeBet : handleConnectWallet}
                       className="relative w-full text-white hover:opacity-90 h-14 text-lg font-bold border-2 transition-all duration-300 shadow-lg"
-                      style={{ 
+                      style={{
                         backgroundColor: '#FA014D',
                         borderColor: '#FA014D'
                       }}
                       disabled={isConnected && (!betAmount || !selectedTeam || isPlacingBet)}
                     >
                       <Zap className="w-5 h-5 mr-2" />
-                      {isPlacingBet 
-                        ? "PLACING BET..." 
-                        : isConnected 
-                        ? "CONFIRM BET WITH METAMASK" 
-                        : "CONNECT WALLET"
+                      {isPlacingBet
+                        ? "PLACING BET..."
+                        : isConnected
+                          ? "CONFIRM BET WITH METAMASK"
+                          : "CONNECT WALLET"
                       }
                     </Button>
                   </div>
@@ -769,8 +763,8 @@ export default function BettingPage() {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-black/80">Network:</span>
-                          <span className={`font-mono ${chainId === 31337 ? 'text-green-600' : 'text-red-600'}`}>
-                            {chainId === 31337 ? 'Localhost Hardhat ✓' : `Chain ${chainId} ✗`}
+                          <span className={`font-mono ${chainId === 88882 ? 'text-green-600' : 'text-red-600'}`}>
+                            {chainId === 88882 ? 'Chiliz Testnet ✓' : `Chain ${chainId} ✗`}
                           </span>
                         </div>
                       </div>

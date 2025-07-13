@@ -17,6 +17,11 @@ module.exports = {
             url: "https://spicy-rpc.chiliz.com/",
             accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
             chainId: 88882,
+            ignition: {
+                maxFeePerGas: 3501000000000n, // 2501 gwei
+                maxPriorityFeePerGas: 2_000_000_000n, // 2 gwei
+                disableFeeBumping: true,
+            },
         },
     },
     paths: {
