@@ -252,13 +252,13 @@ export default function BettingPage() {
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full opacity-20">
           <svg viewBox="0 0 1200 800" className="w-full h-full">
-            <path 
-              d="M0,400 Q300,300 600,400 T1200,400 L1200,800 L0,800 Z" 
+            <path
+              d="M0,400 Q300,300 600,400 T1200,400 L1200,800 L0,800 Z"
               fill="rgba(250, 1, 77, 0.3)"
               className="animate-pulse"
             />
-            <path 
-              d="M0,500 Q400,400 800,500 T1200,500 L1200,800 L0,800 Z" 
+            <path
+              d="M0,500 Q400,400 800,500 T1200,500 L1200,800 L0,800 Z"
               fill="rgba(255, 26, 117, 0.2)"
               className="animate-pulse"
               style={{ animationDelay: '1s' }}
@@ -320,12 +320,12 @@ export default function BettingPage() {
                   <p className="text-xs text-pink-300 font-mono">CHZ: {balance ? parseFloat(balance).toFixed(2) : '0.00'}</p>
                   <p className="text-xs text-pink-300 font-mono">Freebets: {parseFloat(freebets).toFixed(2)}</p>
                 </div>
-                
+
                 <Link href="/profile">
                   <div className="relative">
                     <div className="absolute inset-0 transform skew-x-2 rounded-lg" style={{ backgroundColor: '#FA014D' }}></div>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       className="relative bg-white/20 border-white/30 text-white hover:opacity-90 backdrop-blur-sm transition-all duration-300"
                       style={{ borderColor: '#FA014D' }}
                     >
@@ -516,7 +516,6 @@ export default function BettingPage() {
                           <Coins className="w-6 h-6 text-white" />
                           <span className="font-bold text-white">CHZ</span>
                         </div>
-                        <p className="text-xs text-black/60 mt-1">Ethereum</p>
                       </button>
 
                       <button
