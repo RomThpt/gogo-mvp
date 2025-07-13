@@ -230,9 +230,35 @@ export default function BettingPage() {
   }
 
   return (
-    <div className="min-h-screen text-black relative" style={{
-      background: 'radial-gradient(ellipse 250% 180% at 50% 100%, white 0%, white 15%, #FA014D 45%, #FA014D 100%)'
+    <div className="min-h-screen text-black relative overflow-hidden" style={{
+      background: `
+        radial-gradient(circle 400px at 20% 20%, rgba(250, 1, 77, 1) 0%, transparent 50%),
+        radial-gradient(circle 300px at 80% 30%, rgba(250, 1, 77, 0.9) 0%, transparent 50%),
+        radial-gradient(circle 500px at 40% 70%, rgba(250, 1, 77, 0.95) 0%, transparent 50%),
+        radial-gradient(circle 350px at 85% 80%, rgba(250, 1, 77, 0.8) 0%, transparent 50%),
+        radial-gradient(circle 250px at 10% 60%, rgba(250, 1, 77, 0.7) 0%, transparent 50%),
+        radial-gradient(circle 200px at 60% 40%, rgba(220, 0, 60, 0.9) 0%, transparent 50%),
+        linear-gradient(135deg, #D1003D 0%, #FA014D 20%, #FF1A75 40%, #FF4D94 60%, #FF80B3 80%, #FFB3D1 100%)
+      `
     }}>
+      {/* Vagues animées */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full opacity-20">
+          <svg viewBox="0 0 1200 800" className="w-full h-full">
+            <path 
+              d="M0,400 Q300,300 600,400 T1200,400 L1200,800 L0,800 Z" 
+              fill="rgba(250, 1, 77, 0.3)"
+              className="animate-pulse"
+            />
+            <path 
+              d="M0,500 Q400,400 800,500 T1200,500 L1200,800 L0,800 Z" 
+              fill="rgba(255, 26, 117, 0.2)"
+              className="animate-pulse"
+              style={{ animationDelay: '1s' }}
+            />
+          </svg>
+        </div>
+      </div>
       {/* Toast Notification */}
       {toast && (
         <motion.div
@@ -269,22 +295,31 @@ export default function BettingPage() {
       )}
       <div className="container mx-auto px-4 py-8 pt-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <div className="flex justify-between items-start mb-4">
-            <Link href="/" className="inline-flex items-center hover:opacity-80" style={{ color: '#FA014D' }}>
+          <div className="flex justify-between items-start mb-4 relative z-20">
+            <Link href="/" className="inline-flex items-center hover:opacity-80 text-white cursor-pointer z-30 relative">
               <ArrowLeft className="w-5 h-5 mr-2" />
               Back to Home
             </Link>
 
+            {/* Logo centré */}
+            <div className="absolute left-1/2 transform -translate-x-1/2 z-10">
+              <img src="/LOGO.svg" alt="GOGO Logo" className="w-32 h-12" />
+            </div>
+
             {/* Profile Button */}
             {isConnected && (
               <Link href="/profile">
-                <Button 
-                  variant="outline" 
-                  className="bg-white/20 border-white/30 text-white hover:bg-white/30 backdrop-blur-sm"
-                >
-                  <User className="w-4 h-4 mr-2" />
-                  View Profile
-                </Button>
+                <div className="relative">
+                  <div className="absolute inset-0 transform skew-x-2 rounded-lg" style={{ backgroundColor: '#FA014D' }}></div>
+                  <Button 
+                    variant="outline" 
+                    className="relative bg-white/20 border-white/30 text-white hover:opacity-90 backdrop-blur-sm transition-all duration-300"
+                    style={{ borderColor: '#FA014D' }}
+                  >
+                    <User className="w-4 h-4 mr-2" />
+                    View Profile
+                  </Button>
+                </div>
               </Link>
             )}
           </div>
@@ -308,8 +343,8 @@ export default function BettingPage() {
                     }`}
                     onClick={() => setSelectedMatch(match)}
                   >
-                    <div className="absolute inset-0 bg-white/30 backdrop-blur-sm transform skew-y-1 rounded-lg"></div>
-                    <div className="absolute inset-0 bg-white/20 border border-white/30 transform -skew-y-1 rounded-lg"></div>
+                    <div className="absolute inset-0 bg-gray-100/80 backdrop-blur-sm transform skew-y-1 rounded-lg"></div>
+                    <div className="absolute inset-0 bg-gray-50/70 border border-gray-200/80 transform -skew-y-1 rounded-lg"></div>
 
                     <div className="relative p-6 border-l-4 border-red-500">
                       <div className="flex justify-between items-center mb-4">
@@ -428,9 +463,9 @@ export default function BettingPage() {
           <motion.div initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }}>
             <div className="sticky top-24">
               <div className="relative mb-6">
-                <div className="absolute inset-0 bg-white/30 backdrop-blur-sm transform skew-x-12 rounded-lg"></div>
-                <div className="relative bg-white/20 p-6 border-2 border-white/30">
-                  <h2 className="text-2xl font-bold text-white">Place Your Bet</h2>
+                <div className="absolute inset-0 bg-gray-100/80 backdrop-blur-sm transform skew-x-12 rounded-lg"></div>
+                <div className="relative bg-gray-50/70 p-6 border-2 border-gray-200/80">
+                  <h2 className="text-2xl font-bold" style={{ color: '#FA014D' }}>Place Your Bet</h2>
                 </div>
               </div>
 
@@ -439,7 +474,7 @@ export default function BettingPage() {
                   {/* Match sélectionné */}
                   <div className="relative">
                     <div className="absolute -inset-1 rounded-lg blur opacity-50" style={{ backgroundColor: 'rgba(250, 1, 77, 0.3)' }}></div>
-                    <div className="relative bg-white/40 backdrop-blur-sm p-4 rounded-lg border" style={{ borderColor: 'rgba(250, 1, 77, 0.3)' }}>
+                    <div className="relative bg-gray-100/80 backdrop-blur-sm p-4 rounded-lg border" style={{ borderColor: 'rgba(250, 1, 77, 0.5)' }}>
                       <p className="text-sm mb-2 font-mono font-bold" style={{ color: '#FA014D' }}>SELECTED MATCH</p>
                       <p className="font-bold text-lg text-black">
                         {selectedMatch.homeTeam} vs {selectedMatch.awayTeam}

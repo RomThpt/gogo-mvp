@@ -50,9 +50,12 @@ export default function Navigation() {
           </div>
 
           {/* Mobile Menu Button */}
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </Button>
+          <div className="relative">
+            <div className="absolute inset-0 transform skew-x-2 rounded-lg" style={{ backgroundColor: '#FA014D' }}></div>
+            <Button variant="ghost" size="icon" className="relative md:hidden bg-white/10 backdrop-blur-sm border border-white/20 hover:opacity-90 transition-all duration-300" onClick={() => setIsOpen(!isOpen)}>
+              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </Button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}

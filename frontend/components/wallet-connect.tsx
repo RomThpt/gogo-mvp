@@ -156,7 +156,7 @@ export default function WalletConnect() {
           <p className="text-sm text-red-400 font-semibold">Connection Error</p>
           <p className="text-xs text-red-300">{error}</p>
         </div>
-        <Button variant="ghost" size="sm" onClick={() => setError("")} className="text-red-400 hover:text-red-300 p-1">
+        <Button variant="ghost" size="sm" onClick={() => setError("")} className="text-red-400 hover:text-red-300 p-1 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg">
           <X className="w-4 h-4" />
         </Button>
       </motion.div>
@@ -179,23 +179,31 @@ export default function WalletConnect() {
         </div>
         <div className="flex space-x-2">
           {chainId !== "0x15b38" && (
+            <div className="relative">
+              <div className="absolute inset-0 transform skew-x-2 rounded-lg" style={{ backgroundColor: '#FA014D' }}></div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={switchToChilizChain}
+                className="relative border-white/50 text-white hover:opacity-90 rounded-xl bg-transparent text-xs transition-all duration-300"
+                style={{ borderColor: '#FA014D' }}
+              >
+                Switch to Chiliz
+              </Button>
+            </div>
+          )}
+          <div className="relative">
+            <div className="absolute inset-0 transform skew-x-2 rounded-lg" style={{ backgroundColor: '#FA014D' }}></div>
             <Button
               variant="outline"
               size="sm"
-              onClick={switchToChilizChain}
-              className="border-orange-500/50 text-orange-400 hover:bg-orange-500/10 rounded-xl bg-transparent text-xs"
+              onClick={disconnectWallet}
+              className="relative border-white/50 text-white hover:opacity-90 rounded-xl bg-transparent transition-all duration-300"
+              style={{ borderColor: '#FA014D' }}
             >
-              Switch to Chiliz
+              Disconnect
             </Button>
-          )}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={disconnectWallet}
-            className="border-white/50 text-white hover:bg-white/10 rounded-xl bg-transparent"
-          >
-            Disconnect
-          </Button>
+          </div>
         </div>
       </motion.div>
     )
@@ -203,24 +211,28 @@ export default function WalletConnect() {
 
   return (
     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-      <Button
-        onClick={connectWallet}
-        disabled={isConnecting}
-        className="bg-white/20 hover:bg-white/30 text-white font-semibold px-8 py-4 rounded-2xl text-lg shadow-lg backdrop-blur-sm border border-white/30 disabled:opacity-50"
-      >
-        {isConnecting ? (
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-            className="w-6 h-6 mr-3"
-          >
-            <AlertCircle className="w-6 h-6" />
-          </motion.div>
-        ) : (
-          <Wallet className="w-6 h-6 mr-3" />
-        )}
-        {isConnecting ? "Connecting..." : "Connect MetaMask"}
-      </Button>
+      <div className="relative">
+        <div className="absolute inset-0 transform skew-x-2 rounded-lg" style={{ backgroundColor: '#FA014D' }}></div>
+        <Button
+          onClick={connectWallet}
+          disabled={isConnecting}
+          className="relative bg-white/20 hover:opacity-90 text-white font-semibold px-8 py-4 rounded-2xl text-lg shadow-lg backdrop-blur-sm border border-white/30 disabled:opacity-50 transition-all duration-300"
+          style={{ borderColor: '#FA014D' }}
+        >
+          {isConnecting ? (
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+              className="w-6 h-6 mr-3"
+            >
+              <AlertCircle className="w-6 h-6" />
+            </motion.div>
+          ) : (
+            <Wallet className="w-6 h-6 mr-3" />
+          )}
+          {isConnecting ? "Connecting..." : "Connect MetaMask"}
+        </Button>
+      </div>
     </motion.div>
   )
 }

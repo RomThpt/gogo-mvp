@@ -194,9 +194,12 @@ export default function ProfilePage() {
             <Trophy className="w-16 h-16 mx-auto mb-4" style={{ color: '#FA014D' }} />
             <h2 className="text-2xl font-bold mb-4">Connect Your Wallet</h2>
             <p className="text-gray-600 mb-6">Connect your wallet to view your betting history, positions, and freebets.</p>
-            <Button onClick={connectWallet} className="w-full" style={{ backgroundColor: '#FA014D' }}>
-              Connect Wallet
-            </Button>
+            <div className="relative">
+              <div className="absolute inset-0 transform skew-x-2 rounded-lg" style={{ backgroundColor: '#FA014D' }}></div>
+              <Button onClick={connectWallet} className="relative w-full text-white hover:opacity-90 transition-all duration-300 shadow-lg" style={{ backgroundColor: '#FA014D', borderColor: '#FA014D' }}>
+                Connect Wallet
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -240,10 +243,20 @@ export default function ProfilePage() {
 
       <div className="container mx-auto px-4 py-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <Link href="/" className="inline-flex items-center hover:opacity-80 mb-4" style={{ color: '#FA014D' }}>
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Home
-          </Link>
+          <div className="flex justify-between items-start mb-4">
+            <Link href="/betting" className="inline-flex items-center hover:opacity-80 text-white">
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Back to Betting
+            </Link>
+
+            {/* Logo centré */}
+            <div className="absolute left-1/2 transform -translate-x-1/2">
+              <img src="/LOGO.svg" alt="GOGO Logo" className="w-32 h-12" />
+            </div>
+
+            {/* Espace vide pour équilibrer */}
+            <div className="w-24"></div>
+          </div>
 
           <h1 className="text-4xl md:text-6xl font-bold mb-4 text-white">
             Your Profile
@@ -253,39 +266,47 @@ export default function ProfilePage() {
 
         {/* Quick Stats */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="grid md:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-white/20 backdrop-blur-sm border-white/30">
-            <CardContent className="p-4 text-center">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gray-100/40 backdrop-blur-sm transform skew-y-1 rounded-lg"></div>
+            <div className="absolute inset-0 bg-gray-50/30 border border-gray-200/40 transform -skew-y-1 rounded-lg"></div>
+            <div className="relative p-4 text-center border-l-4" style={{ borderLeftColor: '#FA014D' }}>
               <Trophy className="w-8 h-8 mx-auto mb-2" style={{ color: '#FA014D' }} />
               <p className="text-2xl font-bold text-white">{userBets.length}</p>
               <p className="text-sm text-white/80">Total Bets</p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
           
-          <Card className="bg-white/20 backdrop-blur-sm border-white/30">
-            <CardContent className="p-4 text-center">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gray-100/40 backdrop-blur-sm transform skew-y-1 rounded-lg"></div>
+            <div className="absolute inset-0 bg-gray-50/30 border border-gray-200/40 transform -skew-y-1 rounded-lg"></div>
+            <div className="relative p-4 text-center border-l-4" style={{ borderLeftColor: '#FA014D' }}>
               <Gift className="w-8 h-8 mx-auto mb-2" style={{ color: '#FA014D' }} />
               <p className="text-2xl font-bold text-white">{parseFloat(freebets).toFixed(2)}</p>
               <p className="text-sm text-white/80">Freebets (CHZ)</p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
           
-          <Card className="bg-white/20 backdrop-blur-sm border-white/30">
-            <CardContent className="p-4 text-center">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gray-100/40 backdrop-blur-sm transform skew-y-1 rounded-lg"></div>
+            <div className="absolute inset-0 bg-gray-50/30 border border-gray-200/40 transform -skew-y-1 rounded-lg"></div>
+            <div className="relative p-4 text-center border-l-4" style={{ borderLeftColor: '#FA014D' }}>
               <Lock className="w-8 h-8 mx-auto mb-2" style={{ color: '#FA014D' }} />
               <p className="text-2xl font-bold text-white">{userPositions.length}</p>
               <p className="text-sm text-white/80">Staked Positions</p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
           
-          <Card className="bg-white/20 backdrop-blur-sm border-white/30">
-            <CardContent className="p-4 text-center">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gray-100/40 backdrop-blur-sm transform skew-y-1 rounded-lg"></div>
+            <div className="absolute inset-0 bg-gray-50/30 border border-gray-200/40 transform -skew-y-1 rounded-lg"></div>
+            <div className="relative p-4 text-center border-l-4" style={{ borderLeftColor: '#FA014D' }}>
               <Unlock className="w-8 h-8 mx-auto mb-2" style={{ color: '#FA014D' }} />
               <p className="text-2xl font-bold text-white">
                 {userPositions.filter(pos => isPositionUnlocked(pos.unlockTimestamp) && !pos.claimed && !pos.restaked).length}
               </p>
               <p className="text-sm text-white/80">Claimable</p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </motion.div>
 
         {/* Main Content */}
@@ -298,12 +319,13 @@ export default function ProfilePage() {
             </TabsList>
 
             <TabsContent value="bets" className="mt-6">
-              <Card className="bg-white/20 backdrop-blur-sm border-white/30">
-                <CardHeader>
-                  <CardTitle className="text-white">Your Betting History</CardTitle>
-                  <CardDescription className="text-white/80">All your placed bets and their outcomes</CardDescription>
-                </CardHeader>
-                <CardContent>
+              <div className="relative">
+                <div className="absolute inset-0 bg-gray-100/40 backdrop-blur-sm transform skew-y-1 rounded-lg"></div>
+                <div className="absolute inset-0 bg-gray-50/30 border border-gray-200/40 transform -skew-y-1 rounded-lg"></div>
+                <div className="relative p-6 border-l-4" style={{ borderLeftColor: '#FA014D' }}>
+                  <h3 className="text-2xl font-bold mb-2" style={{ color: '#FA014D' }}>Your Betting History</h3>
+                  <p className="text-white/80 mb-6">All your placed bets and their outcomes</p>
+                  
                   {isLoading ? (
                     <div className="text-center py-8">
                       <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#FA014D' }} />
@@ -314,53 +336,61 @@ export default function ProfilePage() {
                       <Trophy className="w-16 h-16 mx-auto mb-4 text-white/50" />
                       <p className="text-white/80">No bets placed yet</p>
                       <Link href="/betting">
-                        <Button className="mt-4" style={{ backgroundColor: '#FA014D' }}>
-                          Place Your First Bet
-                        </Button>
+                        <div className="relative">
+                          <div className="absolute inset-0 transform skew-x-2 rounded-lg" style={{ backgroundColor: '#FA014D' }}></div>
+                          <Button className="relative mt-4 text-white hover:opacity-90 transition-all duration-300 shadow-lg" style={{ backgroundColor: '#FA014D', borderColor: '#FA014D' }}>
+                            Place Your First Bet
+                          </Button>
+                        </div>
                       </Link>
                     </div>
                   ) : (
                     <div className="space-y-4">
                       {userBets.map((bet, index) => (
-                        <div key={index} className="bg-white/10 rounded-lg p-4 border border-white/20">
-                          <div className="flex justify-between items-start mb-2">
-                            <div className="flex items-center space-x-2">
-                              <Badge variant={bet.processed ? (bet.won ? "default" : "destructive") : "secondary"}>
-                                {bet.processed ? (bet.won ? "Won" : "Lost") : "Pending"}
-                              </Badge>
-                              <Badge variant="outline" className="text-white border-white/30">
-                                {bet.isFanToken ? "Fan Token" : "CHZ"}
-                              </Badge>
-                            </div>
-                            <p className="text-sm text-white/60">{formatTimestamp(bet.timestamp)}</p>
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <p className="text-sm text-white/80">Bet Amount</p>
-                              <p className="font-bold text-white">{ethers.formatEther(bet.amount)} CHZ</p>
-                            </div>
-                            {bet.processed && bet.won && (
-                              <div>
-                                <p className="text-sm text-white/80">Payout</p>
-                                <p className="font-bold text-green-400">{ethers.formatEther(bet.payout)} CHZ</p>
+                        <div key={index} className="relative">
+                          <div className="absolute inset-0 bg-gray-100/15 backdrop-blur-sm transform skew-y-1 rounded-lg"></div>
+                          <div className="absolute inset-0 bg-gray-50/10 border border-gray-200/20 transform -skew-y-1 rounded-lg"></div>
+                          <div className="relative p-4 border-l-4" style={{ borderLeftColor: '#FA014D' }}>
+                            <div className="flex justify-between items-start mb-2">
+                              <div className="flex items-center space-x-2">
+                                <Badge variant={bet.processed ? (bet.won ? "default" : "destructive") : "secondary"}>
+                                  {bet.processed ? (bet.won ? "Won" : "Lost") : "Pending"}
+                                </Badge>
+                                <Badge variant="outline" className="text-white border-white/30">
+                                  {bet.isFanToken ? "Fan Token" : "CHZ"}
+                                </Badge>
                               </div>
-                            )}
+                              <p className="text-sm text-white/60">{formatTimestamp(bet.timestamp)}</p>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <p className="text-sm text-white/80">Bet Amount</p>
+                                <p className="font-bold text-white">{ethers.formatEther(bet.amount)} CHZ</p>
+                              </div>
+                              {bet.processed && bet.won && (
+                                <div>
+                                  <p className="text-sm text-white/80">Payout</p>
+                                  <p className="font-bold text-green-400">{ethers.formatEther(bet.payout)} CHZ</p>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ))}
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </TabsContent>
 
             <TabsContent value="positions" className="mt-6">
-              <Card className="bg-white/20 backdrop-blur-sm border-white/30">
-                <CardHeader>
-                  <CardTitle className="text-white">Staked Positions</CardTitle>
-                  <CardDescription className="text-white/80">Your locked funds from losing bets (14-day cooldown)</CardDescription>
-                </CardHeader>
-                <CardContent>
+              <div className="relative">
+                <div className="absolute inset-0 bg-gray-100/40 backdrop-blur-sm transform skew-y-1 rounded-lg"></div>
+                <div className="absolute inset-0 bg-gray-50/30 border border-gray-200/40 transform -skew-y-1 rounded-lg"></div>
+                <div className="relative p-6 border-l-4" style={{ borderLeftColor: '#FA014D' }}>
+                  <h3 className="text-2xl font-bold mb-2" style={{ color: '#FA014D' }}>Staked Positions</h3>
+                  <p className="text-white/80 mb-6">Your locked funds from losing bets (14-day cooldown)</p>
+                  
                   {isLoading ? (
                     <div className="text-center py-8">
                       <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#FA014D' }} />
@@ -378,140 +408,164 @@ export default function ProfilePage() {
                         const canClaim = unlocked && !position.claimed && !position.restaked
                         
                         return (
-                          <div key={index} className="bg-white/10 rounded-lg p-4 border border-white/20">
-                            <div className="flex justify-between items-start mb-4">
-                              <div className="flex items-center space-x-2">
-                                <Badge variant={canClaim ? "default" : position.claimed ? "secondary" : "destructive"}>
-                                  {position.claimed ? "Claimed" : position.restaked ? "Restaked" : canClaim ? "Ready" : "Locked"}
-                                </Badge>
-                                {unlocked ? <Unlock className="w-4 h-4 text-green-400" /> : <Lock className="w-4 h-4 text-orange-400" />}
+                          <div key={index} className="relative">
+                            <div className="absolute inset-0 bg-gray-100/15 backdrop-blur-sm transform skew-y-1 rounded-lg"></div>
+                            <div className="absolute inset-0 bg-gray-50/10 border border-gray-200/20 transform -skew-y-1 rounded-lg"></div>
+                            <div className="relative p-4 border-l-4" style={{ borderLeftColor: '#FA014D' }}>
+                              <div className="flex justify-between items-start mb-4">
+                                <div className="flex items-center space-x-2">
+                                  <Badge variant={canClaim ? "default" : position.claimed ? "secondary" : "destructive"}>
+                                    {position.claimed ? "Claimed" : position.restaked ? "Restaked" : canClaim ? "Ready" : "Locked"}
+                                  </Badge>
+                                  {unlocked ? <Unlock className="w-4 h-4 text-green-400" /> : <Lock className="w-4 h-4 text-orange-400" />}
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-sm text-white/80">Amount</p>
+                                  <p className="font-bold text-white">{ethers.formatEther(position.amount)} CHZ</p>
+                                </div>
                               </div>
-                              <div className="text-right">
-                                <p className="text-sm text-white/80">Amount</p>
-                                <p className="font-bold text-white">{ethers.formatEther(position.amount)} CHZ</p>
-                              </div>
-                            </div>
-                            
-                            <div className="mb-4">
-                              <p className="text-sm text-white/80 mb-1">
-                                {unlocked ? "Unlocked" : "Unlock Time"}
-                              </p>
-                              <div className="flex items-center space-x-2">
-                                <Calendar className="w-4 h-4 text-white/60" />
-                                <p className="text-sm text-white">
-                                  {unlocked ? formatTimestamp(position.unlockTimestamp) : getTimeRemaining(position.unlockTimestamp)}
+                              
+                              <div className="mb-4">
+                                <p className="text-sm text-white/80 mb-1">
+                                  {unlocked ? "Unlocked" : "Unlock Time"}
                                 </p>
+                                <div className="flex items-center space-x-2">
+                                  <Calendar className="w-4 h-4 text-white/60" />
+                                  <p className="text-sm text-white">
+                                    {unlocked ? formatTimestamp(position.unlockTimestamp) : getTimeRemaining(position.unlockTimestamp)}
+                                  </p>
+                                </div>
                               </div>
-                            </div>
 
-                            {canClaim && (
-                              <div className="flex space-x-2">
-                                <Button 
-                                  onClick={() => handleClaimPosition(index)}
-                                  variant="outline"
-                                  size="sm"
-                                  className="flex-1 border-white/30 text-white hover:bg-white/10"
-                                >
-                                  <Coins className="w-4 h-4 mr-2" />
-                                  Claim (20%)
-                                </Button>
-                                <Button 
-                                  onClick={() => handleRestakePosition(index)}
-                                  size="sm"
-                                  className="flex-1"
-                                  style={{ backgroundColor: '#FA014D' }}
-                                >
-                                  <RefreshCw className="w-4 h-4 mr-2" />
-                                  Restake (+5% Bonus)
-                                </Button>
-                              </div>
-                            )}
+                              {canClaim && (
+                                <div className="flex space-x-2">
+                                  <div className="relative flex-1">
+                                    <div className="absolute inset-0 transform skew-x-2 rounded-lg" style={{ backgroundColor: '#FA014D' }}></div>
+                                    <Button 
+                                      onClick={() => handleClaimPosition(index)}
+                                      variant="outline"
+                                      size="sm"
+                                      className="relative w-full border-white/30 text-white hover:opacity-90 transition-all duration-300"
+                                      style={{ borderColor: '#FA014D' }}
+                                    >
+                                      <Coins className="w-4 h-4 mr-2" />
+                                      Claim (20%)
+                                    </Button>
+                                  </div>
+                                  <div className="relative flex-1">
+                                    <div className="absolute inset-0 transform skew-x-2 rounded-lg" style={{ backgroundColor: '#FA014D' }}></div>
+                                    <Button 
+                                      onClick={() => handleRestakePosition(index)}
+                                      size="sm"
+                                      className="relative w-full text-white hover:opacity-90 transition-all duration-300 shadow-lg"
+                                      style={{ backgroundColor: '#FA014D', borderColor: '#FA014D' }}
+                                    >
+                                      <RefreshCw className="w-4 h-4 mr-2" />
+                                      Restake (+5% Bonus)
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         )
                       })}
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </TabsContent>
 
             <TabsContent value="contests" className="mt-6">
-              <Card className="bg-pink-50/10 backdrop-blur-md border border-white/20 shadow-2xl">
-                <CardHeader className="bg-white/5 backdrop-blur-sm border-b border-white/10">
-                  <CardTitle className="text-white">Freebet Contests</CardTitle>
-                  <CardDescription className="text-white/80">Use your freebets to enter exciting contests and win prizes</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="mb-6 p-6 bg-white/10 backdrop-blur-lg rounded-xl border border-white/20 shadow-lg">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="p-3 bg-white/20 backdrop-blur-sm rounded-full border border-white/30">
-                          <Gift className="w-6 h-6 text-white" />
+              <div className="relative">
+                <div className="absolute inset-0 bg-gray-100/40 backdrop-blur-sm transform skew-y-1 rounded-lg"></div>
+                <div className="absolute inset-0 bg-gray-50/30 border border-gray-200/40 transform -skew-y-1 rounded-lg"></div>
+                <div className="relative p-6 border-l-4" style={{ borderLeftColor: '#FA014D' }}>
+                  <h3 className="text-2xl font-bold mb-2" style={{ color: '#FA014D' }}>Freebet Contests</h3>
+                  <p className="text-white/80 mb-6">Use your freebets to enter exciting contests and win prizes</p>
+                  
+                  <div className="relative mb-6">
+                    <div className="absolute inset-0 bg-gray-100/15 backdrop-blur-sm transform skew-y-1 rounded-lg"></div>
+                    <div className="absolute inset-0 bg-gray-50/10 border border-gray-200/20 transform -skew-y-1 rounded-lg"></div>
+                    <div className="relative p-6 border-l-4" style={{ borderLeftColor: '#FA014D' }}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="p-3 bg-gray-100/20 backdrop-blur-sm rounded-full border border-gray-200/30">
+                            <Gift className="w-6 h-6 text-white" />
+                          </div>
+                          <div>
+                            <p className="font-bold text-white text-lg">Your Freebets</p>
+                            <p className="text-white/70">Available to spend on contests</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-bold text-white text-lg">Your Freebets</p>
-                          <p className="text-white/70">Available to spend on contests</p>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-white">{parseFloat(freebets).toFixed(4)} CHZ</p>
+                          <p className="text-white/60 text-sm">Ready to use</p>
                         </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-2xl font-bold text-white">{parseFloat(freebets).toFixed(4)} CHZ</p>
-                        <p className="text-white/60 text-sm">Ready to use</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-4">
                     {contests.map((contest) => (
-                      <div key={contest.id} className="bg-white/8 backdrop-blur-md rounded-xl p-6 border border-white/15 hover:border-white/25 hover:bg-white/12 transition-all duration-300 shadow-lg">
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-2 mb-2">
-                              <h3 className="font-bold text-white text-lg">{contest.name}</h3>
-                              <Badge 
-                                variant="outline" 
-                                className="text-white/80 border-white/30 bg-white/10 backdrop-blur-sm"
-                              >
-                                {contest.type}
-                              </Badge>
-                            </div>
-                            <p className="text-white/90 mb-4">{contest.description}</p>
-                            <div className="bg-white/8 backdrop-blur-sm rounded-md p-2 border border-white/15">
-                              <div className="flex items-center justify-center space-x-6 text-sm">
-                                <div className="flex items-center space-x-2 text-white/90">
-                                  <Clock className="w-4 h-4" />
-                                  <span className="font-medium">{contest.duration}</span>
-                                </div>
-                                <div className="w-px h-4 bg-white/30"></div>
-                                <div className="flex items-center space-x-2 text-white/90">
-                                  <Target className="w-4 h-4" />
-                                  <span className="font-medium">{contest.participants} participants</span>
+                      <div key={contest.id} className="relative">
+                        <div className="absolute inset-0 bg-gray-100/15 backdrop-blur-sm transform skew-y-1 rounded-lg"></div>
+                        <div className="absolute inset-0 bg-gray-50/10 border border-gray-200/20 transform -skew-y-1 rounded-lg"></div>
+                        <div className="relative p-6 border-l-4" style={{ borderLeftColor: '#FA014D' }}>
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-2 mb-2">
+                                <h3 className="font-bold text-white text-lg">{contest.name}</h3>
+                                <Badge 
+                                  variant="outline" 
+                                  className="text-white/80 border-gray-200/30 bg-gray-100/10 backdrop-blur-sm"
+                                >
+                                  {contest.type}
+                                </Badge>
+                              </div>
+                              <p className="text-white/90 mb-4">{contest.description}</p>
+                              <div className="bg-gray-100/8 backdrop-blur-sm rounded-md p-2 border border-gray-200/15">
+                                <div className="flex items-center justify-center space-x-6 text-sm">
+                                  <div className="flex items-center space-x-2 text-white/90">
+                                    <Clock className="w-4 h-4" />
+                                    <span className="font-medium">{contest.duration}</span>
+                                  </div>
+                                  <div className="w-px h-4 bg-white/30"></div>
+                                  <div className="flex items-center space-x-2 text-white/90">
+                                    <Target className="w-4 h-4" />
+                                    <span className="font-medium">{contest.participants} participants</span>
+                                  </div>
                                 </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                        
-                        <div className="flex justify-between items-center">
-                          <div className="bg-white/10 backdrop-blur-sm p-3 rounded-lg border border-white/20">
-                            <p className="text-white/70 text-sm">Prize</p>
-                            <p className="font-bold text-white">{contest.prize}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-white/70 text-sm mb-1">Entry Cost</p>
-                            <div className="flex items-center space-x-3">
-                              <p className="font-bold text-white text-lg">{contest.cost} CHZ</p>
-                              <Button 
-                                onClick={() => handleEnterContest(contest)}
-                                size="sm"
-                                disabled={parseFloat(freebets) < contest.cost}
-                                className={`backdrop-blur-sm border transition-all duration-300 ${
-                                  parseFloat(freebets) >= contest.cost 
-                                    ? 'bg-white/20 hover:bg-white/30 border-white/30 hover:border-white/50 text-white' 
-                                    : 'bg-white/5 border-white/10 text-white/40 cursor-not-allowed'
-                                }`}
-                              >
-                                Enter Contest
-                              </Button>
+                          
+                          <div className="flex justify-between items-center">
+                            <div className="bg-white/10 backdrop-blur-sm p-3 rounded-lg border border-white/20">
+                              <p className="text-white/70 text-sm">Prize</p>
+                              <p className="font-bold text-white">{contest.prize}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-white/70 text-sm mb-1">Entry Cost</p>
+                              <div className="flex items-center space-x-3">
+                                <p className="font-bold text-white text-lg">{contest.cost} CHZ</p>
+                                <div className="relative">
+                                  <div className="absolute inset-0 transform skew-x-2 rounded-lg" style={{ backgroundColor: '#FA014D' }}></div>
+                                  <Button 
+                                    onClick={() => handleEnterContest(contest)}
+                                    size="sm"
+                                    disabled={parseFloat(freebets) < contest.cost}
+                                    className={`relative backdrop-blur-sm border transition-all duration-300 ${
+                                      parseFloat(freebets) >= contest.cost 
+                                        ? 'bg-white/20 hover:opacity-90 border-white/30 text-white' 
+                                        : 'bg-white/5 border-white/10 text-white/40 cursor-not-allowed'
+                                    }`}
+                                    style={{ borderColor: '#FA014D' }}
+                                  >
+                                    Enter Contest
+                                  </Button>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -520,23 +574,31 @@ export default function ProfilePage() {
                   </div>
 
                   {/* Call to Action */}
-                  <div className="mt-6 p-6 bg-black/20 backdrop-blur-md rounded-lg border border-white/30 text-center shadow-lg">
-                    <div className="bg-white/10 backdrop-blur-sm rounded-md p-3 mb-3">
-                      <p className="text-white font-medium text-base">Need more freebets?</p>
-                      <p className="text-white/90 text-sm">Place losing bets to earn 30% back as freebets</p>
+                  <div className="relative mt-6">
+                    <div className="absolute inset-0 bg-white/20 backdrop-blur-sm transform skew-y-1 rounded-lg"></div>
+                    <div className="absolute inset-0 bg-white/10 border border-white/20 transform -skew-y-1 rounded-lg"></div>
+                    <div className="relative p-6 border-l-4 text-center" style={{ borderLeftColor: '#FA014D' }}>
+                      <div className="bg-white/10 backdrop-blur-sm rounded-md p-3 mb-3">
+                        <p className="text-white font-medium text-base">Need more freebets?</p>
+                        <p className="text-white/90 text-sm">Place losing bets to earn 30% back as freebets</p>
+                      </div>
+                      <Link href="/betting">
+                        <div className="relative">
+                          <div className="absolute inset-0 transform skew-x-2 rounded-lg" style={{ backgroundColor: '#FA014D' }}></div>
+                          <Button 
+                            variant="outline" 
+                            size="lg"
+                            className="relative bg-white/15 backdrop-blur-sm border-white/40 text-white font-semibold hover:opacity-90 transition-all duration-300 shadow-md"
+                            style={{ borderColor: '#FA014D' }}
+                          >
+                            Place More Bets
+                          </Button>
+                        </div>
+                      </Link>
                     </div>
-                    <Link href="/betting">
-                      <Button 
-                        variant="outline" 
-                        size="lg"
-                        className="bg-white/15 backdrop-blur-sm border-white/40 text-white font-semibold hover:bg-white/25 hover:border-white/60 shadow-md"
-                      >
-                        Place More Bets
-                      </Button>
-                    </Link>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </TabsContent>
           </Tabs>
         </motion.div>
