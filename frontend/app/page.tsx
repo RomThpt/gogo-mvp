@@ -1,6 +1,7 @@
 "use client"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
+import { User } from "lucide-react"
 import Link from "next/link"
 
 export default function HomePage() {
@@ -9,6 +10,25 @@ export default function HomePage() {
     <div className="min-h-screen text-black relative" style={{
       background: 'radial-gradient(ellipse 250% 180% at 50% 100%, white 0%, white 15%, #FA014D 45%, #FA014D 100%)'
     }}>
+      
+      {/* Floating Profile Button */}
+      <motion.div 
+        initial={{ opacity: 0, x: 50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 2.0 }}
+        className="fixed top-6 right-6 z-50"
+      >
+        <Link href="/profile">
+          <Button 
+            variant="outline" 
+            size="lg"
+            className="bg-white/90 border-white text-black hover:bg-white shadow-lg"
+          >
+            <User className="w-5 h-5 mr-2" />
+            Profile
+          </Button>
+        </Link>
+      </motion.div>
       
       {/* Hero Section */}
       <section className="min-h-screen flex flex-col justify-center items-center relative z-10">

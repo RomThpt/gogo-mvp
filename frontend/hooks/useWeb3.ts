@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { ethers } from 'ethers'
-import { LOCALHOST_CONFIG, CHILIZ_TESTNET_CONFIG, getContract } from '@/lib/contracts'
+import { LOCALHOST_CONFIG, CHILIZ_TESTNET_CONFIG, getContract, getPSGTokenContract, getBarcaTokenContract, PSG_TOKEN_ADDRESS, BARCA_TOKEN_ADDRESS } from '@/lib/contracts'
 
 declare global {
   interface Window {
@@ -22,6 +22,7 @@ export interface BetData {
   isFanToken: boolean
   teamSelection: 'home' | 'away'
   currency: string
+  tokenAddress?: string
 }
 
 export function useWeb3() {
@@ -150,7 +151,7 @@ export function useWeb3() {
   }, [])
 
   const placeBet = useCallback(async (betData: BetData) => {
-    if (!state.signer) {
+    if (!state.signer || !state.account) {
       throw new Error('Wallet not connected')
     }
 
@@ -158,17 +159,48 @@ export function useWeb3() {
       const contract = getContract(state.signer)
       const amountInWei = ethers.parseEther(betData.amount)
       
-      // Call the placeBet function on the contract
-      const tx = await contract.placeBet(
-        state.account,
-        amountInWei,
-        betData.isFanToken,
-        { value: amountInWei }
-      )
+      if (betData.isFanToken && betData.tokenAddress) {
+        // For fan token bets, approve the contract to spend tokens
+        const tokenContract = new ethers.Contract(betData.tokenAddress, [
+          'function approve(address spender, uint256 amount) external returns (bool)',
+          'function balanceOf(address account) external view returns (uint256)'
+        ], state.signer)
+        
+        // Check balance first
+        const balance = await tokenContract.balanceOf(state.account)
+        if (balance < amountInWei) {
+          throw new Error(`Insufficient ${betData.currency} balance`)
+        }
+        
+        // Approve contract to spend tokens
+        const approveTx = await tokenContract.approve(contract.target, amountInWei)
+        await approveTx.wait()
+        
+        // Place bet with fan tokens
+        const tx = await contract['placeBet(address,uint256,bool,address)'](
+          state.account,
+          amountInWei,
+          betData.isFanToken,
+          betData.tokenAddress
+        )
+        
+        return {
+          hash: tx.hash,
+          wait: () => tx.wait(),
+        }
+      } else {
+        // CHZ bet
+        const tx = await contract['placeBet(address,uint256,bool)'](
+          state.account,
+          amountInWei,
+          betData.isFanToken,
+          { value: amountInWei }
+        )
 
-      return {
-        hash: tx.hash,
-        wait: () => tx.wait(),
+        return {
+          hash: tx.hash,
+          wait: () => tx.wait(),
+        }
       }
     } catch (error) {
       console.error('Error placing bet:', error)
@@ -205,6 +237,141 @@ export function useWeb3() {
       return '0'
     }
   }, [state.account, state.provider])
+
+  const getUserPositions = useCallback(async () => {
+    if (!state.account) {
+      return []
+    }
+
+    try {
+      const contract = getContract(state.provider || undefined)
+      const positions = await contract.getUserPositions(state.account)
+      return positions
+    } catch (error) {
+      console.error('Error fetching user positions:', error)
+      return []
+    }
+  }, [state.account, state.provider])
+
+  const claimPosition = useCallback(async (positionId: number) => {
+    if (!state.signer) {
+      throw new Error('Wallet not connected')
+    }
+
+    try {
+      const contract = getContract(state.signer)
+      const tx = await contract.claimUserShare(positionId)
+      return {
+        hash: tx.hash,
+        wait: () => tx.wait(),
+      }
+    } catch (error) {
+      console.error('Error claiming position:', error)
+      throw error
+    }
+  }, [state.signer])
+
+  const restakePosition = useCallback(async (positionId: number) => {
+    if (!state.signer) {
+      throw new Error('Wallet not connected')
+    }
+
+    try {
+      const contract = getContract(state.signer)
+      const tx = await contract.restakePosition(positionId)
+      return {
+        hash: tx.hash,
+        wait: () => tx.wait(),
+      }
+    } catch (error) {
+      console.error('Error restaking position:', error)
+      throw error
+    }
+  }, [state.signer])
+
+  const useFreebets = useCallback(async (amount: string) => {
+    if (!state.signer || !state.account) {
+      throw new Error('Wallet not connected')
+    }
+
+    try {
+      const contract = getContract(state.signer)
+      const amountInWei = ethers.parseEther(amount)
+      const tx = await contract.useFreebets(state.account, amountInWei)
+      return {
+        hash: tx.hash,
+        wait: () => tx.wait(),
+      }
+    } catch (error) {
+      console.error('Error using freebets:', error)
+      throw error
+    }
+  }, [state.signer, state.account])
+
+  const getTokenBalance = useCallback(async (tokenAddress: string) => {
+    if (!state.account) {
+      return '0'
+    }
+
+    try {
+      const tokenContract = new ethers.Contract(tokenAddress, [
+        'function balanceOf(address account) external view returns (uint256)',
+        'function decimals() external view returns (uint8)'
+      ], state.provider || new ethers.JsonRpcProvider(LOCALHOST_CONFIG.rpcUrls[0]))
+      
+      const balance = await tokenContract.balanceOf(state.account)
+      return ethers.formatEther(balance)
+    } catch (error) {
+      console.error('Error fetching token balance:', error)
+      return '0'
+    }
+  }, [state.account, state.provider])
+
+  const buyTokens = useCallback(async (tokenAddress: string, ethAmount: string) => {
+    if (!state.signer) {
+      throw new Error('Wallet not connected')
+    }
+
+    try {
+      const tokenContract = new ethers.Contract(tokenAddress, [
+        'function buyTokens() external payable'
+      ], state.signer)
+      
+      const tx = await tokenContract.buyTokens({
+        value: ethers.parseEther(ethAmount)
+      })
+
+      return {
+        hash: tx.hash,
+        wait: () => tx.wait(),
+      }
+    } catch (error) {
+      console.error('Error buying tokens:', error)
+      throw error
+    }
+  }, [state.signer])
+
+  const sellTokens = useCallback(async (tokenAddress: string, tokenAmount: string) => {
+    if (!state.signer) {
+      throw new Error('Wallet not connected')
+    }
+
+    try {
+      const tokenContract = new ethers.Contract(tokenAddress, [
+        'function sellTokens(uint256 tokenAmount) external'
+      ], state.signer)
+      
+      const tx = await tokenContract.sellTokens(ethers.parseEther(tokenAmount))
+
+      return {
+        hash: tx.hash,
+        wait: () => tx.wait(),
+      }
+    } catch (error) {
+      console.error('Error selling tokens:', error)
+      throw error
+    }
+  }, [state.signer])
 
   // Initialize connection if already connected
   useEffect(() => {
@@ -261,5 +428,12 @@ export function useWeb3() {
     placeBet,
     getUserBets,
     getUserFreebets,
+    getUserPositions,
+    claimPosition,
+    restakePosition,
+    useFreebets,
+    getTokenBalance,
+    buyTokens,
+    sellTokens,
   }
 }

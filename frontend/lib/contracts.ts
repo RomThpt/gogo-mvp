@@ -2,7 +2,15 @@ import { ethers } from "ethers";
 
 export const GOGO_CONTRACT_ADDRESS =
     process.env.NEXT_PUBLIC_GOGO_CONTRACT_ADDRESS ||
-    "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+    "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d";
+
+export const PSG_TOKEN_ADDRESS =
+    process.env.NEXT_PUBLIC_PSG_TOKEN_ADDRESS ||
+    "0x68B1D87F95878fE05B998F19b66F4baba5De1aed";
+
+export const BARCA_TOKEN_ADDRESS =
+    process.env.NEXT_PUBLIC_BARCA_TOKEN_ADDRESS ||
+    "0x3Aa5ebB10DC797CAC828524e59A333d0A371443c";
 
 export const GOGO_ABI = [
     {
@@ -26,10 +34,46 @@ export const GOGO_ABI = [
     {
         inputs: [
             { internalType: "address", name: "user", type: "address" },
+            { internalType: "uint256", name: "amount", type: "uint256" },
+            { internalType: "bool", name: "isFanToken", type: "bool" },
+            { internalType: "address", name: "tokenAddress", type: "address" },
+        ],
+        name: "placeBet",
+        outputs: [],
+        stateMutability: "payable",
+        type: "function",
+    },
+    {
+        inputs: [
+            { internalType: "address", name: "user", type: "address" },
             { internalType: "uint256", name: "betId", type: "uint256" },
             { internalType: "bool", name: "win", type: "bool" },
         ],
         name: "processResult",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
+        inputs: [{ internalType: "uint256", name: "positionId", type: "uint256" }],
+        name: "claimUserShare",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
+        inputs: [{ internalType: "uint256", name: "positionId", type: "uint256" }],
+        name: "restakePosition",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
+        inputs: [
+            { internalType: "address", name: "user", type: "address" },
+            { internalType: "uint256", name: "amount", type: "uint256" },
+        ],
+        name: "useFreebets",
         outputs: [],
         stateMutability: "nonpayable",
         type: "function",
@@ -40,26 +84,33 @@ export const GOGO_ABI = [
         outputs: [
             {
                 components: [
-                    {
-                        internalType: "uint256",
-                        name: "amount",
-                        type: "uint256",
-                    },
+                    { internalType: "uint256", name: "amount", type: "uint256" },
                     { internalType: "bool", name: "isFanToken", type: "bool" },
-                    {
-                        internalType: "uint256",
-                        name: "timestamp",
-                        type: "uint256",
-                    },
+                    { internalType: "uint256", name: "timestamp", type: "uint256" },
                     { internalType: "bool", name: "processed", type: "bool" },
                     { internalType: "bool", name: "won", type: "bool" },
-                    {
-                        internalType: "uint256",
-                        name: "payout",
-                        type: "uint256",
-                    },
+                    { internalType: "uint256", name: "payout", type: "uint256" },
                 ],
                 internalType: "struct GOGO.Bet[]",
+                name: "",
+                type: "tuple[]",
+            },
+        ],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
+        inputs: [{ internalType: "address", name: "user", type: "address" }],
+        name: "getUserPositions",
+        outputs: [
+            {
+                components: [
+                    { internalType: "uint256", name: "amount", type: "uint256" },
+                    { internalType: "uint256", name: "unlockTimestamp", type: "uint256" },
+                    { internalType: "bool", name: "claimed", type: "bool" },
+                    { internalType: "bool", name: "restaked", type: "bool" },
+                ],
+                internalType: "struct GOGO.ClaimablePosition[]",
                 name: "",
                 type: "tuple[]",
             },
@@ -75,44 +126,113 @@ export const GOGO_ABI = [
         type: "function",
     },
     {
+        inputs: [{ internalType: "address", name: "user", type: "address" }],
+        name: "getClaimableAmount",
+        outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
+        inputs: [{ internalType: "address", name: "user", type: "address" }],
+        name: "getUserAvailablePositions",
+        outputs: [{ internalType: "uint256[]", name: "", type: "uint256[]" }],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
         anonymous: false,
         inputs: [
-            {
-                indexed: true,
-                internalType: "address",
-                name: "user",
-                type: "address",
-            },
-            {
-                indexed: true,
-                internalType: "uint256",
-                name: "betId",
-                type: "uint256",
-            },
-            {
-                indexed: false,
-                internalType: "uint256",
-                name: "amount",
-                type: "uint256",
-            },
-            {
-                indexed: false,
-                internalType: "bool",
-                name: "isFanToken",
-                type: "bool",
-            },
+            { indexed: true, internalType: "address", name: "user", type: "address" },
+            { indexed: true, internalType: "uint256", name: "betId", type: "uint256" },
+            { indexed: false, internalType: "uint256", name: "amount", type: "uint256" },
+            { indexed: false, internalType: "bool", name: "isFanToken", type: "bool" },
         ],
         name: "BetPlaced",
         type: "event",
     },
+    {
+        anonymous: false,
+        inputs: [
+            { indexed: true, internalType: "address", name: "user", type: "address" },
+            { indexed: true, internalType: "uint256", name: "betId", type: "uint256" },
+            { indexed: false, internalType: "bool", name: "won", type: "bool" },
+            { indexed: false, internalType: "uint256", name: "payout", type: "uint256" },
+        ],
+        name: "BetProcessed",
+        type: "event",
+    },
+    {
+        anonymous: false,
+        inputs: [
+            { indexed: true, internalType: "address", name: "user", type: "address" },
+            { indexed: false, internalType: "uint256", name: "amount", type: "uint256" },
+        ],
+        name: "FreebetsGenerated",
+        type: "event",
+    },
+] as const;
+
+export const ERC20_ABI = [
+    {
+        "inputs": [
+            { "internalType": "address", "name": "spender", "type": "address" },
+            { "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "approve",
+        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
+        "name": "balanceOf",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "buyTokens",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "tokenAmount", "type": "uint256" }],
+        "name": "sellTokens",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "decimals",
+        "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "symbol",
+        "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "name",
+        "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+        "stateMutability": "view",
+        "type": "function"
+    }
 ] as const;
 
 export const LOCALHOST_CONFIG = {
     chainId: 31337,
     name: "Localhost Hardhat",
     nativeCurrency: {
-        name: "ETH",
-        symbol: "ETH",
+        name: "CHZ",
+        symbol: "CHZ",
         decimals: 18,
     },
     rpcUrls: ["http://127.0.0.1:8545"],
@@ -150,6 +270,39 @@ export function getContract(signer?: ethers.Signer) {
     return new ethers.Contract(
         GOGO_CONTRACT_ADDRESS,
         GOGO_ABI,
+        signer || provider
+    );
+}
+
+export function getPSGTokenContract(signer?: ethers.Signer) {
+    const provider =
+        signer?.provider ||
+        new ethers.JsonRpcProvider(LOCALHOST_CONFIG.rpcUrls[0]);
+    return new ethers.Contract(
+        PSG_TOKEN_ADDRESS,
+        ERC20_ABI,
+        signer || provider
+    );
+}
+
+export function getBarcaTokenContract(signer?: ethers.Signer) {
+    const provider =
+        signer?.provider ||
+        new ethers.JsonRpcProvider(LOCALHOST_CONFIG.rpcUrls[0]);
+    return new ethers.Contract(
+        BARCA_TOKEN_ADDRESS,
+        ERC20_ABI,
+        signer || provider
+    );
+}
+
+export function getTokenContract(tokenAddress: string, signer?: ethers.Signer) {
+    const provider =
+        signer?.provider ||
+        new ethers.JsonRpcProvider(LOCALHOST_CONFIG.rpcUrls[0]);
+    return new ethers.Contract(
+        tokenAddress,
+        ERC20_ABI,
         signer || provider
     );
 }

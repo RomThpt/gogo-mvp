@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { ArrowLeft, Coins, Gift, TrendingUp, Timer } from "lucide-react"
+import { ArrowLeft, Coins, Gift, TrendingUp, Timer, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent } from "@/components/ui/tabs"
 import Link from "next/link"
@@ -83,10 +83,23 @@ export default function DashboardPage() {
     }}>
       <div className="container mx-auto px-4 py-8 pt-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <Link href="/" className="inline-flex items-center hover:opacity-80 mb-4" style={{ color: '#FA014D' }}>
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Home
-          </Link>
+          <div className="flex justify-between items-start mb-4">
+            <Link href="/" className="inline-flex items-center hover:opacity-80" style={{ color: '#FA014D' }}>
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Back to Home
+            </Link>
+
+            {/* Profile Button */}
+            <Link href="/profile">
+              <Button 
+                variant="outline" 
+                className="bg-white/80 border-gray-300 text-black hover:bg-white"
+              >
+                <User className="w-4 h-4 mr-2" />
+                View Profile
+              </Button>
+            </Link>
+          </div>
 
           <h1 className="text-4xl md:text-6xl font-bold mb-4 text-black">
             My Dashboard

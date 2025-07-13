@@ -10,20 +10,20 @@ async function main() {
     console.log("Balance:", hre.ethers.formatEther(balance), "CHZ");
 
     // Deploy GOGO contract
-    const GOGO = await hre.ethers.getContractFactory("GOGO");
+    const GOGOFactory = await hre.ethers.getContractFactory("GOGO");
     console.log("Deploying GOGO...");
 
-    const GOGO = await GOGO.deploy(deployer.address, {
+    const gogo = await GOGOFactory.deploy(deployer.address, {
         gasLimit: 3000000, // Set explicit gas limit
     });
 
-    console.log("Transaction hash:", GOGO.deploymentTransaction().hash);
+    console.log("Transaction hash:", gogo.deploymentTransaction().hash);
     console.log("Waiting for 1 confirmation...");
 
     // Wait for just 1 confirmation
-    await GOGO.deploymentTransaction().wait(1);
+    await gogo.deploymentTransaction().wait(1);
 
-    const contractAddress = await GOGO.getAddress();
+    const contractAddress = await gogo.getAddress();
     console.log("✅ GOGO Contract Address:", contractAddress);
     console.log(
         "🔗 Explorer:",

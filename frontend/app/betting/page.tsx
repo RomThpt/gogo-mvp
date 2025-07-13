@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { ArrowLeft, Trophy, Clock, Zap, Coins, CheckCircle, XCircle, AlertCircle } from "lucide-react"
+import { ArrowLeft, Trophy, Clock, Zap, Coins, CheckCircle, XCircle, AlertCircle, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { useWeb3 } from "@/hooks/useWeb3"
+import { PSG_TOKEN_ADDRESS, BARCA_TOKEN_ADDRESS } from "@/lib/contracts"
 
 export default function BettingPage() {
   const [selectedMatch, setSelectedMatch] = useState(null)
@@ -173,11 +174,22 @@ export default function BettingPage() {
       showToast("warning", "Please confirm the transaction in MetaMask...")
 
       const isFanToken = betCurrency !== "CHZ"
+      let tokenAddress = undefined
+      
+      if (isFanToken) {
+        if (betCurrency === "PSG") {
+          tokenAddress = PSG_TOKEN_ADDRESS
+        } else if (betCurrency === "BAR") {
+          tokenAddress = BARCA_TOKEN_ADDRESS
+        }
+      }
+      
       const betData = {
         amount: betAmount,
         isFanToken,
         teamSelection: selectedTeam as 'home' | 'away',
         currency: betCurrency,
+        tokenAddress,
       }
 
       const tx = await placeBetContract(betData)
@@ -257,10 +269,25 @@ export default function BettingPage() {
       )}
       <div className="container mx-auto px-4 py-8 pt-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <Link href="/" className="inline-flex items-center hover:opacity-80 mb-4" style={{ color: '#FA014D' }}>
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Home
-          </Link>
+          <div className="flex justify-between items-start mb-4">
+            <Link href="/" className="inline-flex items-center hover:opacity-80" style={{ color: '#FA014D' }}>
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Back to Home
+            </Link>
+
+            {/* Profile Button */}
+            {isConnected && (
+              <Link href="/profile">
+                <Button 
+                  variant="outline" 
+                  className="bg-white/20 border-white/30 text-white hover:bg-white/30 backdrop-blur-sm"
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  View Profile
+                </Button>
+              </Link>
+            )}
+          </div>
 
           <h1 className="text-4xl md:text-6xl font-bold mb-4 text-white">
             Place Your Bet
@@ -442,7 +469,7 @@ export default function BettingPage() {
                           <Coins className="w-6 h-6 text-white" />
                           <span className="font-bold text-white">CHZ</span>
                         </div>
-                        <p className="text-xs text-black/60 mt-1">Chiliz Token</p>
+                        <p className="text-xs text-black/60 mt-1">Ethereum</p>
                       </button>
 
                       <button
@@ -703,7 +730,7 @@ export default function BettingPage() {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-black/80">Balance:</span>
-                          <span className="font-mono text-black">{parseFloat(balance).toFixed(4)} ETH</span>
+                          <span className="font-mono text-black">{parseFloat(balance).toFixed(4)} CHZ</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-black/80">Network:</span>
