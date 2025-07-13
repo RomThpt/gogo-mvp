@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { ethers } from 'ethers'
-import { LOCALHOST_CONFIG, CHILIZ_TESTNET_CONFIG, getContract, getPSGTokenContract, getBarcaTokenContract, PSG_TOKEN_ADDRESS, BARCA_TOKEN_ADDRESS } from '@/lib/contracts'
+import { CHILIZ_TESTNET_CONFIG, getContract, getPSGTokenContract, getBarcaTokenContract, PSG_TOKEN_ADDRESS, BARCA_TOKEN_ADDRESS } from '@/lib/contracts'
 
 declare global {
   interface Window {
@@ -69,8 +69,8 @@ export function useWeb3() {
 
       // Check if we're on the correct network
       const network = await provider.getNetwork()
-      if (Number(network.chainId) !== LOCALHOST_CONFIG.chainId) {
-        await switchToLocalhost()
+      if (Number(network.chainId) !== CHILIZ_TESTNET_CONFIG.chainId) {
+        await switchToChilizTestnet()
       }
 
       return true
@@ -80,40 +80,7 @@ export function useWeb3() {
     }
   }, [updateState])
 
-  const switchToLocalhost = useCallback(async () => {
-    if (!window.ethereum) {
-      throw new Error('MetaMask is not installed')
-    }
 
-    try {
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: `0x${LOCALHOST_CONFIG.chainId.toString(16)}` }],
-      })
-    } catch (switchError: any) {
-      // This error code indicates that the chain has not been added to MetaMask
-      if (switchError.code === 4902) {
-        try {
-          await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [
-              {
-                chainId: `0x${LOCALHOST_CONFIG.chainId.toString(16)}`,
-                chainName: LOCALHOST_CONFIG.name,
-                nativeCurrency: LOCALHOST_CONFIG.nativeCurrency,
-                rpcUrls: LOCALHOST_CONFIG.rpcUrls,
-                blockExplorerUrls: LOCALHOST_CONFIG.blockExplorerUrls,
-              },
-            ],
-          })
-        } catch (addError) {
-          throw new Error('Failed to add Localhost network to MetaMask')
-        }
-      } else {
-        throw new Error('Failed to switch to Localhost network')
-      }
-    }
-  }, [])
 
   const switchToChilizTestnet = useCallback(async () => {
     if (!window.ethereum) {
@@ -317,7 +284,7 @@ export function useWeb3() {
       const tokenContract = new ethers.Contract(tokenAddress, [
         'function balanceOf(address account) external view returns (uint256)',
         'function decimals() external view returns (uint8)'
-      ], state.provider || new ethers.JsonRpcProvider(LOCALHOST_CONFIG.rpcUrls[0]))
+      ], state.provider || new ethers.JsonRpcProvider(CHILIZ_TESTNET_CONFIG.rpcUrls[0]))
       
       const balance = await tokenContract.balanceOf(state.account)
       return ethers.formatEther(balance)
@@ -423,7 +390,6 @@ export function useWeb3() {
   return {
     ...state,
     connectWallet,
-    switchToLocalhost,
     switchToChilizTestnet,
     placeBet,
     getUserBets,

@@ -25,20 +25,26 @@ async function main() {
         const GOGO = await hre.ethers.getContractFactory("GOGO");
         const treasury = deployer.address; // Use deployer as treasury for demo
 
+        // Fan token addresses on Chiliz testnet (using placeholder addresses for now)
+        const psgToken = "0x0000000000000000000000000000000000000001"; // Placeholder PSG token
+        const barcaToken = "0x0000000000000000000000000000000000000002"; // Placeholder Barca token
+
         console.log("📋 Deploying GOGO contract...");
-        const GOGO = await GOGO.deploy(treasury);
+        const gogo = await GOGO.deploy(treasury, psgToken, barcaToken);
+
+        console.log(gogo);
 
         console.log("⏳ Waiting for deployment confirmation...");
-        await GOGO.waitForDeployment();
+        await gogo.waitForDeployment();
 
-        const contractAddress = await GOGO.getAddress();
+        const contractAddress = await gogo.getAddress();
 
         console.log("✅ GOGO deployed to:", contractAddress);
         console.log("🏛️ Treasury address:", treasury);
         console.log("🔗 Network: Chiliz Testnet (Chain ID: 88882)");
 
         // Verify deployment
-        const deployedTreasury = await GOGO.treasury();
+        const deployedTreasury = await gogo.treasury();
         console.log("✓ Contract treasury verified:", deployedTreasury);
 
         // Display important info for integration
