@@ -16,6 +16,9 @@ export const GOGO_ABI = [
     {
         inputs: [
             { internalType: "address", name: "_treasury", type: "address" },
+            { internalType: "address", name: "_psgToken", type: "address" },
+            { internalType: "address", name: "_barcaToken", type: "address" },
+            { internalType: "address", name: "_chilizStaking", type: "address" },
         ],
         stateMutability: "nonpayable",
         type: "constructor",
@@ -133,8 +136,9 @@ export const GOGO_ABI = [
                     },
                     { internalType: "bool", name: "claimed", type: "bool" },
                     { internalType: "bool", name: "restaked", type: "bool" },
+                    { internalType: "uint256", name: "stakingRewards", type: "uint256" },
                 ],
-                internalType: "struct GOGO.ClaimablePosition[]",
+                internalType: "struct GOGOStaking.StakingPosition[]",
                 name: "",
                 type: "tuple[]",
             },
@@ -161,6 +165,27 @@ export const GOGO_ABI = [
         name: "getUserAvailablePositions",
         outputs: [{ internalType: "uint256[]", name: "", type: "uint256[]" }],
         stateMutability: "view",
+        type: "function",
+    },
+    {
+        inputs: [],
+        name: "getTotalStakedInProtocol",
+        outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
+        inputs: [],
+        name: "getStakingRewards",
+        outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
+        inputs: [],
+        name: "distributeStakingRewards",
+        outputs: [],
+        stateMutability: "nonpayable",
         type: "function",
     },
     {
@@ -237,6 +262,23 @@ export const GOGO_ABI = [
             },
         ],
         name: "FreebetsGenerated",
+        type: "event",
+    },
+    {
+        anonymous: false,
+        inputs: [
+            { indexed: true, internalType: "address", name: "user", type: "address" },
+            { indexed: false, internalType: "uint256", name: "rewards", type: "uint256" },
+        ],
+        name: "ChilizStakingRewardsDistributed",
+        type: "event",
+    },
+    {
+        anonymous: false,
+        inputs: [
+            { indexed: false, internalType: "uint256", name: "amount", type: "uint256" },
+        ],
+        name: "FundsStakedInChiliz",
         type: "event",
     },
 ] as const;

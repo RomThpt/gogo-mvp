@@ -391,7 +391,18 @@ export default function ProfilePage() {
                 <div className="absolute inset-0 bg-gray-50/30 border border-gray-200/40 transform -skew-y-1 rounded-lg"></div>
                 <div className="relative p-6 border-l-4" style={{ borderLeftColor: '#FA014D' }}>
                   <h3 className="text-2xl font-bold mb-2" style={{ color: '#FA014D' }}>Staked Positions</h3>
-                  <p className="text-white/80 mb-6">Your locked funds from losing bets (14-day cooldown)</p>
+                  <p className="text-white/80 mb-6">Your funds staked in Chiliz Protocol with 14-day cooldown</p>
+                  
+                  <div className="mb-4 p-4 bg-blue-500/20 rounded-lg border border-blue-300/30">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
+                      <span className="text-white font-medium">Chiliz Staking Protocol Integration</span>
+                    </div>
+                    <p className="text-white/90 text-sm">
+                      Your lost bets are automatically staked in the Chiliz Chain staking protocol. 
+                      After 14 days: 80% goes to GOGO funds, 20% remains yours to claim or restake with bonuses!
+                    </p>
+                  </div>
                   
                   {isLoading ? (
                     <div className="text-center py-8">
@@ -422,8 +433,11 @@ export default function ProfilePage() {
                                   {unlocked ? <Unlock className="w-4 h-4 text-green-400" /> : <Lock className="w-4 h-4 text-orange-400" />}
                                 </div>
                                 <div className="text-right">
-                                  <p className="text-sm text-white/80">Amount</p>
+                                  <p className="text-sm text-white/80">Principal + Rewards</p>
                                   <p className="font-bold text-white">{ethers.formatEther(position.amount)} CHZ</p>
+                                  {position.stakingRewards && ethers.formatEther(position.stakingRewards) !== "0.0" && (
+                                    <p className="text-sm text-green-400">+{ethers.formatEther(position.stakingRewards)} CHZ rewards</p>
+                                  )}
                                 </div>
                               </div>
                               
