@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 
 export const GOGO_CONTRACT_ADDRESS =
     process.env.NEXT_PUBLIC_GOGO_CONTRACT_ADDRESS ||
-    "0x86979303e395cae21eee1538bd20764163be8a63";
+    "0x679c9d1f45471f6a540be3230f37d9d35e81be07";
 
 export const PSG_TOKEN_ADDRESS =
     process.env.NEXT_PUBLIC_PSG_TOKEN_ADDRESS ||
@@ -12,25 +12,20 @@ export const BARCA_TOKEN_ADDRESS =
     process.env.NEXT_PUBLIC_BARCA_TOKEN_ADDRESS ||
     "0xa6290a8e9a8afda276c122f109ecb1f402d23510";
 
-export const GOGO_ABI = [
+export const GOGO_STAKING_ABI = [
+    // Constructor
     {
         inputs: [
             { internalType: "address", name: "_treasury", type: "address" },
+            { internalType: "address", name: "_psgToken", type: "address" },
+            { internalType: "address", name: "_barcaToken", type: "address" },
+            { internalType: "address", name: "_chilizValidator", type: "address" },
         ],
         stateMutability: "nonpayable",
         type: "constructor",
     },
-    {
-        inputs: [
-            { internalType: "address", name: "user", type: "address" },
-            { internalType: "uint256", name: "amount", type: "uint256" },
-            { internalType: "bool", name: "isFanToken", type: "bool" },
-        ],
-        name: "placeBet",
-        outputs: [],
-        stateMutability: "payable",
-        type: "function",
-    },
+    
+    // Core betting functions
     {
         inputs: [
             { internalType: "address", name: "user", type: "address" },
@@ -54,6 +49,8 @@ export const GOGO_ABI = [
         stateMutability: "nonpayable",
         type: "function",
     },
+    
+    // Staking position management
     {
         inputs: [
             { internalType: "uint256", name: "positionId", type: "uint256" },
@@ -73,6 +70,15 @@ export const GOGO_ABI = [
         type: "function",
     },
     {
+        inputs: [],
+        name: "distributeStakingRewards",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    
+    // Freebets
+    {
         inputs: [
             { internalType: "address", name: "user", type: "address" },
             { internalType: "uint256", name: "amount", type: "uint256" },
@@ -82,32 +88,23 @@ export const GOGO_ABI = [
         stateMutability: "nonpayable",
         type: "function",
     },
+    
+    // View functions - User data
     {
         inputs: [{ internalType: "address", name: "user", type: "address" }],
         name: "getUserBets",
         outputs: [
             {
                 components: [
-                    {
-                        internalType: "uint256",
-                        name: "amount",
-                        type: "uint256",
-                    },
+                    { internalType: "uint256", name: "amount", type: "uint256" },
                     { internalType: "bool", name: "isFanToken", type: "bool" },
-                    {
-                        internalType: "uint256",
-                        name: "timestamp",
-                        type: "uint256",
-                    },
+                    { internalType: "address", name: "tokenAddress", type: "address" },
+                    { internalType: "uint256", name: "timestamp", type: "uint256" },
                     { internalType: "bool", name: "processed", type: "bool" },
                     { internalType: "bool", name: "won", type: "bool" },
-                    {
-                        internalType: "uint256",
-                        name: "payout",
-                        type: "uint256",
-                    },
+                    { internalType: "uint256", name: "payout", type: "uint256" },
                 ],
-                internalType: "struct GOGO.Bet[]",
+                internalType: "struct GOGOStaking.Bet[]",
                 name: "",
                 type: "tuple[]",
             },
@@ -121,20 +118,13 @@ export const GOGO_ABI = [
         outputs: [
             {
                 components: [
-                    {
-                        internalType: "uint256",
-                        name: "amount",
-                        type: "uint256",
-                    },
-                    {
-                        internalType: "uint256",
-                        name: "unlockTimestamp",
-                        type: "uint256",
-                    },
+                    { internalType: "uint256", name: "amount", type: "uint256" },
+                    { internalType: "uint256", name: "unlockTimestamp", type: "uint256" },
                     { internalType: "bool", name: "claimed", type: "bool" },
                     { internalType: "bool", name: "restaked", type: "bool" },
+                    { internalType: "uint256", name: "stakingRewards", type: "uint256" },
                 ],
-                internalType: "struct GOGO.ClaimablePosition[]",
+                internalType: "struct GOGOStaking.StakingPosition[]",
                 name: "",
                 type: "tuple[]",
             },
@@ -156,40 +146,102 @@ export const GOGO_ABI = [
         stateMutability: "view",
         type: "function",
     },
+    
+    // View functions - Protocol data
     {
-        inputs: [{ internalType: "address", name: "user", type: "address" }],
-        name: "getUserAvailablePositions",
-        outputs: [{ internalType: "uint256[]", name: "", type: "uint256[]" }],
+        inputs: [],
+        name: "getTotalStakedInProtocol",
+        outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
         stateMutability: "view",
         type: "function",
     },
     {
+        inputs: [],
+        name: "getStakingRewards",
+        outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
+        inputs: [],
+        name: "getValidatorInfo",
+        outputs: [
+            { internalType: "uint256", name: "totalDelegated", type: "uint256" },
+            { internalType: "uint256", name: "commission", type: "uint256" },
+            { internalType: "bool", name: "active", type: "bool" },
+        ],
+        stateMutability: "view",
+        type: "function",
+    },
+    
+    // Public variables (auto-generated getters)
+    {
+        inputs: [],
+        name: "treasury",
+        outputs: [{ internalType: "address", name: "", type: "address" }],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
+        inputs: [],
+        name: "psgToken",
+        outputs: [{ internalType: "address", name: "", type: "address" }],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
+        inputs: [],
+        name: "barcaToken",
+        outputs: [{ internalType: "address", name: "", type: "address" }],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
+        inputs: [],
+        name: "chilizValidator",
+        outputs: [{ internalType: "address", name: "", type: "address" }],
+        stateMutability: "view",
+        type: "function",
+    },
+    {
+        inputs: [],
+        name: "totalStakedInProtocol",
+        outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+        stateMutability: "view",
+        type: "function",
+    },
+    
+    // Admin functions
+    {
+        inputs: [{ internalType: "address", name: "_newValidator", type: "address" }],
+        name: "updateChilizValidator",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
+        inputs: [{ internalType: "address", name: "_newTreasury", type: "address" }],
+        name: "updateTreasury",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    {
+        inputs: [],
+        name: "withdrawEmergency",
+        outputs: [],
+        stateMutability: "nonpayable",
+        type: "function",
+    },
+    
+    // Events
+    {
         anonymous: false,
         inputs: [
-            {
-                indexed: true,
-                internalType: "address",
-                name: "user",
-                type: "address",
-            },
-            {
-                indexed: true,
-                internalType: "uint256",
-                name: "betId",
-                type: "uint256",
-            },
-            {
-                indexed: false,
-                internalType: "uint256",
-                name: "amount",
-                type: "uint256",
-            },
-            {
-                indexed: false,
-                internalType: "bool",
-                name: "isFanToken",
-                type: "bool",
-            },
+            { indexed: true, internalType: "address", name: "user", type: "address" },
+            { indexed: true, internalType: "uint256", name: "betId", type: "uint256" },
+            { indexed: false, internalType: "uint256", name: "amount", type: "uint256" },
+            { indexed: false, internalType: "bool", name: "isFanToken", type: "bool" },
         ],
         name: "BetPlaced",
         type: "event",
@@ -197,25 +249,10 @@ export const GOGO_ABI = [
     {
         anonymous: false,
         inputs: [
-            {
-                indexed: true,
-                internalType: "address",
-                name: "user",
-                type: "address",
-            },
-            {
-                indexed: true,
-                internalType: "uint256",
-                name: "betId",
-                type: "uint256",
-            },
+            { indexed: true, internalType: "address", name: "user", type: "address" },
+            { indexed: true, internalType: "uint256", name: "betId", type: "uint256" },
             { indexed: false, internalType: "bool", name: "won", type: "bool" },
-            {
-                indexed: false,
-                internalType: "uint256",
-                name: "payout",
-                type: "uint256",
-            },
+            { indexed: false, internalType: "uint256", name: "payout", type: "uint256" },
         ],
         name: "BetProcessed",
         type: "event",
@@ -223,20 +260,56 @@ export const GOGO_ABI = [
     {
         anonymous: false,
         inputs: [
-            {
-                indexed: true,
-                internalType: "address",
-                name: "user",
-                type: "address",
-            },
-            {
-                indexed: false,
-                internalType: "uint256",
-                name: "amount",
-                type: "uint256",
-            },
+            { indexed: true, internalType: "address", name: "user", type: "address" },
+            { indexed: false, internalType: "uint256", name: "amount", type: "uint256" },
+            { indexed: false, internalType: "uint256", name: "unlockTime", type: "uint256" },
+        ],
+        name: "StakingPositionCreated",
+        type: "event",
+    },
+    {
+        anonymous: false,
+        inputs: [
+            { indexed: true, internalType: "address", name: "user", type: "address" },
+            { indexed: false, internalType: "uint256", name: "amount", type: "uint256" },
         ],
         name: "FreebetsGenerated",
+        type: "event",
+    },
+    {
+        anonymous: false,
+        inputs: [
+            { indexed: true, internalType: "address", name: "user", type: "address" },
+            { indexed: false, internalType: "uint256", name: "amount", type: "uint256" },
+        ],
+        name: "UserShareClaimed",
+        type: "event",
+    },
+    {
+        anonymous: false,
+        inputs: [
+            { indexed: true, internalType: "address", name: "user", type: "address" },
+            { indexed: false, internalType: "uint256", name: "amount", type: "uint256" },
+            { indexed: false, internalType: "uint256", name: "bonus", type: "uint256" },
+        ],
+        name: "PositionRestaked",
+        type: "event",
+    },
+    {
+        anonymous: false,
+        inputs: [
+            { indexed: true, internalType: "address", name: "user", type: "address" },
+            { indexed: false, internalType: "uint256", name: "rewards", type: "uint256" },
+        ],
+        name: "ChilizStakingRewardsDistributed",
+        type: "event",
+    },
+    {
+        anonymous: false,
+        inputs: [
+            { indexed: false, internalType: "uint256", name: "amount", type: "uint256" },
+        ],
+        name: "FundsStakedInChiliz",
         type: "event",
     },
 ] as const;
@@ -328,7 +401,7 @@ export function getContract(signer?: ethers.Signer) {
         new ethers.JsonRpcProvider(CHILIZ_TESTNET_CONFIG.rpcUrls[0]);
     return new ethers.Contract(
         GOGO_CONTRACT_ADDRESS,
-        GOGO_ABI,
+        GOGO_STAKING_ABI,
         signer || provider
     );
 }
