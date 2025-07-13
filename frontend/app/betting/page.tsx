@@ -714,7 +714,7 @@ export default function BettingPage() {
                             </div>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-black/80 font-mono text-sm">IF LOST (AUTO-STAKED):</span>
+                            <span className="text-black/80 font-mono text-sm">IF LOST (CHILIZ STAKING):</span>
                             <span className="font-black" style={{ color: '#FA014D' }}>
                               {betCurrency === "CHZ"
                                 ? betAmount
@@ -722,6 +722,29 @@ export default function BettingPage() {
                               CHZ
                             </span>
                           </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Chiliz Staking Info */}
+                  {selectedMatch && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mb-6"
+                    >
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-blue-500/20 backdrop-blur-sm transform skew-y-1 rounded-lg"></div>
+                        <div className="absolute inset-0 bg-blue-400/10 border border-blue-300/30 transform -skew-y-1 rounded-lg"></div>
+                        <div className="relative p-4 border-l-4" style={{ borderLeftColor: '#0066FF' }}>
+                          <div className="flex items-center space-x-2 mb-2">
+                            <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
+                            <span className="text-white font-medium text-sm">Powered by Chiliz Chain Staking</span>
+                          </div>
+                          <p className="text-white/90 text-xs">
+                            Lost bets are automatically staked in Chiliz Protocol for 14 days. You get 20% back + rewards!
+                          </p>
                         </div>
                       </div>
                     </motion.div>
