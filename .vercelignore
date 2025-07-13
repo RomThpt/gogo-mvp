@@ -1,0 +1,11 @@
+node_modules
+.git
+backend
+contracts
+scripts
+hardhat.config.js
+.env
+.env.local
+cache
+artifacts
+typechain-types

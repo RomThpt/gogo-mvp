@@ -79,11 +79,48 @@ Frontend (Next.js) → Backend API (Node.js) → Smart Contract (Solidity)
                    Chiliz Testnet/Mainnet
 ```
 
+## 🚀 Vercel Deployment
+
+### Quick Deploy to Vercel
+
+#### Method 1: Vercel CLI (Recommended)
+```bash
+# Install Vercel CLI
+npm install -g vercel
+
+# Login to Vercel
+vercel login
+
+# Deploy from project root
+vercel --prod
+```
+
+#### Method 2: GitHub Integration
+1. Push to GitHub: `git push origin main`
+2. Connect to Vercel dashboard
+3. Import repository
+4. Set build configuration
+
+### Vercel Build Settings
+- **Framework**: Next.js
+- **Root Directory**: `frontend`
+- **Build Command**: `npm run build`
+- **Output Directory**: `.next`
+- **Node.js Version**: 18.x
+
+### Environment Variables (Vercel Dashboard)
+```env
+NEXT_PUBLIC_GOGO_CONTRACT_ADDRESS=0x679c9d1f45471f6a540be3230f37d9d35e81be07
+NEXT_PUBLIC_PSG_TOKEN_ADDRESS=0x9be59eaf153312cdbb992a0f38755f89d280030d
+NEXT_PUBLIC_BARCA_TOKEN_ADDRESS=0xa6290a8e9a8afda276c122f109ecb1f402d23510
+```
+
 ## Live Demo URLs
 
--   **Frontend**: http://localhost:3000
--   **Backend API**: http://localhost:3001
--   **Contract**: Deployed on Chiliz Testnet
+-   **Production**: https://your-app.vercel.app (after deployment)
+-   **Local Frontend**: http://localhost:3000
+-   **Local Backend API**: http://localhost:3001
+-   **Contract**: Deployed on Chiliz Spicy Testnet
 
 ## Business Model
 

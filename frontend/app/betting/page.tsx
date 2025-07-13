@@ -16,6 +16,7 @@ export default function BettingPage() {
   const [betCurrency, setBetCurrency] = useState("") // Will be set when match is selected
   const [toast, setToast] = useState(null)
   const [isPlacingBet, setIsPlacingBet] = useState(false)
+  const [freebets, setFreebets] = useState("0")
 
   const {
     isConnected,
@@ -35,10 +36,16 @@ export default function BettingPage() {
     setTimeout(() => setToast(null), 4000)
   }
 
-  // Show connection status
+  // Show connection status and load freebets
   useEffect(() => {
     if (isConnected && account) {
       showToast("success", `Connected to ${account.slice(0, 6)}...${account.slice(-4)}`)
+      // Load freebets
+      getUserFreebets().then(balance => {
+        setFreebets(balance || "0")
+      }).catch(error => {
+        console.error('Error loading freebets:', error)
+      })
     }
   }, [isConnected, account])
 
@@ -305,22 +312,29 @@ export default function BettingPage() {
               <img src="/LOGO.svg" alt="GOGO Logo" className="w-32 h-12" />
             </div>
 
-            {/* Profile Button */}
+            {/* Profile Button with Balance */}
             {isConnected && (
-              <Link href="/profile">
-
-                <div className="relative">
-                  <div className="absolute inset-0 transform skew-x-2 rounded-lg" style={{ backgroundColor: '#FA014D' }}></div>
-                  <Button 
-                    variant="outline" 
-                    className="relative bg-white/20 border-white/30 text-white hover:opacity-90 backdrop-blur-sm transition-all duration-300"
-                    style={{ borderColor: '#FA014D' }}
-                  >
-                    <User className="w-4 h-4 mr-2" />
-                    View Profile
-                  </Button>
+              <div className="flex items-center space-x-4">
+                {/* Balance Display */}
+                <div className="text-right">
+                  <p className="text-xs text-pink-300 font-mono">CHZ: {balance ? parseFloat(balance).toFixed(2) : '0.00'}</p>
+                  <p className="text-xs text-pink-300 font-mono">Freebets: {parseFloat(freebets).toFixed(2)}</p>
                 </div>
-              </Link>
+                
+                <Link href="/profile">
+                  <div className="relative">
+                    <div className="absolute inset-0 transform skew-x-2 rounded-lg" style={{ backgroundColor: '#FA014D' }}></div>
+                    <Button 
+                      variant="outline" 
+                      className="relative bg-white/20 border-white/30 text-white hover:opacity-90 backdrop-blur-sm transition-all duration-300"
+                      style={{ borderColor: '#FA014D' }}
+                    >
+                      <User className="w-4 h-4 mr-2" />
+                      View Profile
+                    </Button>
+                  </div>
+                </Link>
+              </div>
             )}
           </div>
 

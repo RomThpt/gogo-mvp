@@ -1,0 +1,29 @@
+{
+  "name": "gogo-mvp",
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/next",
+      "config": {
+        "distDir": ".next"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "frontend/$1"
+    }
+  ],
+  "env": {
+    "NEXT_PUBLIC_GOGO_CONTRACT_ADDRESS": "0x679c9d1f45471f6a540be3230f37d9d35e81be07",
+    "NEXT_PUBLIC_PSG_TOKEN_ADDRESS": "0x9be59eaf153312cdbb992a0f38755f89d280030d",
+    "NEXT_PUBLIC_BARCA_TOKEN_ADDRESS": "0xa6290a8e9a8afda276c122f109ecb1f402d23510"
+  },
+  "functions": {
+    "frontend/pages/api/**/*.js": {
+      "maxDuration": 10
+    }
+  }
+}

@@ -22,6 +22,7 @@ export default function ProfilePage() {
   const { 
     isConnected, 
     account, 
+    balance,
     getUserBets,
     getUserFreebets,
     getUserPositions,
@@ -258,10 +259,37 @@ export default function ProfilePage() {
             <div className="w-24"></div>
           </div>
 
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 text-white">
-            Your Profile
-          </h1>
-          <p className="text-xl text-white">Track your bets, positions, and freebets</p>
+          <div className="flex justify-between items-end mb-4">
+            <div>
+              <h1 className="text-4xl md:text-6xl font-bold mb-4 text-white">
+                Your Profile
+              </h1>
+              <p className="text-xl text-white">Track your bets, positions, and freebets</p>
+            </div>
+            
+            {/* CHZ Balance and Freebets Display */}
+            <div className="flex space-x-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gray-100/40 backdrop-blur-sm transform skew-y-1 rounded-lg"></div>
+                <div className="absolute inset-0 bg-gray-50/30 border border-gray-200/40 transform -skew-y-1 rounded-lg"></div>
+                <div className="relative p-4 text-center border-l-4" style={{ borderLeftColor: '#FA014D' }}>
+                  <Coins className="w-6 h-6 mx-auto mb-2" style={{ color: '#FA014D' }} />
+                  <p className="text-sm text-white/80 font-mono uppercase tracking-wider">CHZ Balance</p>
+                  <p className="text-2xl font-bold text-white">{balance ? parseFloat(balance).toFixed(2) : '0.00'}</p>
+                </div>
+              </div>
+              
+              <div className="relative">
+                <div className="absolute inset-0 bg-gray-100/40 backdrop-blur-sm transform skew-y-1 rounded-lg"></div>
+                <div className="absolute inset-0 bg-gray-50/30 border border-gray-200/40 transform -skew-y-1 rounded-lg"></div>
+                <div className="relative p-4 text-center border-l-4" style={{ borderLeftColor: '#FA014D' }}>
+                  <Gift className="w-6 h-6 mx-auto mb-2" style={{ color: '#FA014D' }} />
+                  <p className="text-sm text-white/80 font-mono uppercase tracking-wider">Freebets</p>
+                  <p className="text-2xl font-bold text-white">{parseFloat(freebets).toFixed(2)}</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </motion.div>
 
         {/* Quick Stats */}
@@ -324,18 +352,18 @@ export default function ProfilePage() {
                 <div className="absolute inset-0 bg-gray-100/40 backdrop-blur-sm transform skew-y-1 rounded-lg"></div>
                 <div className="absolute inset-0 bg-gray-50/30 border border-gray-200/40 transform -skew-y-1 rounded-lg"></div>
                 <div className="relative p-6 border-l-4" style={{ borderLeftColor: '#FA014D' }}>
-                  <h3 className="text-2xl font-bold mb-2" style={{ color: '#FA014D' }}>Your Betting History</h3>
-                  <p className="text-white/80 mb-6">All your placed bets and their outcomes</p>
+                  <h3 className="text-2xl font-bold mb-2 text-black">Your Betting History</h3>
+                  <p className="text-black mb-6">All your placed bets and their outcomes</p>
                   
                   {isLoading ? (
                     <div className="text-center py-8">
                       <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#FA014D' }} />
-                      <p className="text-white/80">Loading bets...</p>
+                      <p className="text-black">Loading bets...</p>
                     </div>
                   ) : userBets.length === 0 ? (
                     <div className="text-center py-8">
                       <Trophy className="w-16 h-16 mx-auto mb-4 text-white/50" />
-                      <p className="text-white/80">No bets placed yet</p>
+                      <p className="text-black">No bets placed yet</p>
                       <Link href="/betting">
                         <div className="relative">
                           <div className="absolute inset-0 transform skew-x-2 rounded-lg" style={{ backgroundColor: '#FA014D' }}></div>
@@ -357,22 +385,22 @@ export default function ProfilePage() {
                                 <Badge variant={bet.processed ? (bet.won ? "default" : "destructive") : "secondary"}>
                                   {bet.processed ? (bet.won ? "Won" : "Lost") : "Pending"}
                                 </Badge>
-                                <Badge variant="outline" className="text-white border-white/30">
+                                <Badge variant="outline" className="text-black border-black/30">
                                   {bet.isFanToken ? "Fan Token" : "CHZ"}
                                 </Badge>
                               </div>
-                              <p className="text-sm text-white/60">{formatTimestamp(bet.timestamp)}</p>
+                              <p className="text-sm text-black/60">{formatTimestamp(bet.timestamp)}</p>
 
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <p className="text-sm text-white/80">Bet Amount</p>
-                                <p className="font-bold text-white">{ethers.formatEther(bet.amount)} CHZ</p>
+                                <p className="text-sm text-black/80">Bet Amount</p>
+                                <p className="font-bold text-black">{ethers.formatEther(bet.amount)} CHZ</p>
                               </div>
                               {bet.processed && bet.won && (
                                 <div>
-                                  <p className="text-sm text-white/80">Payout</p>
-                                  <p className="font-bold text-green-400">{ethers.formatEther(bet.payout)} CHZ</p>
+                                  <p className="text-sm text-black/80">Payout</p>
+                                  <p className="font-bold text-black">{ethers.formatEther(bet.payout)} CHZ</p>
                                 </div>
                               )}
                             </div>
