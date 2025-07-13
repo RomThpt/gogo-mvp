@@ -9,24 +9,24 @@ async function main() {
         (await deployer.provider.getBalance(deployer.address)).toString()
     );
 
-    // Deploy KLIM contract
-    const KLIM = await hre.ethers.getContractFactory("KLIM");
+    // Deploy GOGO contract
+    const GOGO = await hre.ethers.getContractFactory("GOGO");
     const treasury = deployer.address; // Use deployer as treasury for demo
 
     // Deploy with custom gas parameters
-    const klim = await KLIM.deploy(treasury, {
+    const GOGO = await GOGO.deploy(treasury, {
         maxFeePerGas: hre.ethers.parseUnits("25", "gwei"),
         maxPriorityFeePerGas: hre.ethers.parseUnits("1", "gwei"),
         gasLimit: 3000000,
     });
 
-    await klim.waitForDeployment();
+    await GOGO.waitForDeployment();
 
-    console.log("KLIM deployed to:", await klim.getAddress());
+    console.log("GOGO deployed to:", await GOGO.getAddress());
     console.log("Treasury address:", treasury);
 
     // Verify deployment
-    const deployedTreasury = await klim.treasury();
+    const deployedTreasury = await GOGO.treasury();
     console.log("Contract treasury:", deployedTreasury);
 }
 

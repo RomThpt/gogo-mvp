@@ -6,14 +6,27 @@ import { ArrowLeft, Trophy, Clock, Zap, Coins, CheckCircle, XCircle, AlertCircle
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
+import { useWeb3 } from "@/hooks/useWeb3"
 
 export default function BettingPage() {
   const [selectedMatch, setSelectedMatch] = useState(null)
   const [betAmount, setBetAmount] = useState("")
   const [selectedTeam, setSelectedTeam] = useState("")
   const [betCurrency, setBetCurrency] = useState("") // Will be set when match is selected
-  const [isConnected, setIsConnected] = useState(false)
   const [toast, setToast] = useState(null)
+  const [isPlacingBet, setIsPlacingBet] = useState(false)
+  
+  const { 
+    isConnected, 
+    account, 
+    balance, 
+    chainId, 
+    connectWallet, 
+    switchToLocalhost, 
+    placeBet: placeBetContract,
+    getUserBets,
+    getUserFreebets 
+  } = useWeb3()
 
   // Toast functions
   const showToast = (type, message) => {
@@ -21,20 +34,19 @@ export default function BettingPage() {
     setTimeout(() => setToast(null), 4000)
   }
 
-  // Test toast on component mount (for demonstration)
+  // Show connection status
   useEffect(() => {
-    // Show a test toast after 2 seconds to demonstrate functionality
-    const timer = setTimeout(() => {
-      showToast("warning", "MetaMask is not installed. Please install MetaMask to connect your wallet.")
-    }, 2000)
-    
-    return () => clearTimeout(timer)
-  }, [])
+    if (isConnected && account) {
+      showToast("success", `Connected to ${account.slice(0, 6)}...${account.slice(-4)}`)
+    }
+  }, [isConnected, account])
 
-  // Vérifier la connexion wallet
+  // Check if on correct network
   useEffect(() => {
-    checkWalletConnection()
-  }, [])
+    if (isConnected && chainId && chainId !== 31337) {
+      showToast("warning", "Please switch to Localhost Hardhat network for betting")
+    }
+  }, [isConnected, chainId])
 
   // Set default currency when match is selected
   useEffect(() => {
@@ -57,31 +69,16 @@ export default function BettingPage() {
     }
   }
 
-  const checkWalletConnection = async () => {
-    if (typeof window !== "undefined" && window.ethereum) {
-      try {
-        const accounts = await window.ethereum.request({ method: "eth_accounts" })
-        setIsConnected(accounts.length > 0)
-      } catch (error) {
-        console.error("Error checking wallet connection:", error)
-      }
-    }
-  }
-
-  const connectWallet = async () => {
-    if (typeof window !== "undefined" && window.ethereum) {
-      try {
-        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" })
-        setIsConnected(accounts.length > 0)
-        if (accounts.length > 0) {
-          showToast("success", "Wallet connected successfully!")
-        }
-      } catch (error) {
-        console.error("Error connecting wallet:", error)
+  const handleConnectWallet = async () => {
+    try {
+      await connectWallet()
+    } catch (error: any) {
+      console.error("Error connecting wallet:", error)
+      if (error.message.includes('MetaMask is not installed')) {
+        showToast("warning", "MetaMask is not installed. Please install MetaMask to connect your wallet.")
+      } else {
         showToast("error", "Failed to connect wallet. Please try again.")
       }
-    } else {
-      showToast("warning", "MetaMask is not installed. Please install MetaMask to connect your wallet.")
     }
   }
 
@@ -142,27 +139,81 @@ export default function BettingPage() {
       return
     }
 
+    if (chainId !== 31337) {
+      showToast("warning", "Please switch to Localhost Hardhat network")
+      try {
+        await switchToLocalhost()
+        return
+      } catch (error) {
+        showToast("error", "Failed to switch network")
+        return
+      }
+    }
+
     if (!selectedMatch || !selectedTeam || !betAmount) {
       showToast("warning", "Please fill all fields")
       return
     }
 
-    try {
-      // Ici on implémenterait la logique de smart contract
-      console.log("Placing bet:", {
-        match: selectedMatch,
-        team: selectedTeam,
-        amount: betAmount,
-        currency: betCurrency,
-      })
+    const betAmountNum = parseFloat(betAmount)
+    if (betAmountNum <= 0) {
+      showToast("warning", "Bet amount must be greater than 0")
+      return
+    }
 
-      // Simulation d'une transaction
-      showToast("success", 
-        `Bet placed: ${betAmount} ${betCurrency} on ${selectedTeam === "home" ? selectedMatch.homeTeam : selectedMatch.awayTeam}`
-      )
-    } catch (error) {
+    const balanceNum = parseFloat(balance)
+    if (betAmountNum > balanceNum) {
+      showToast("warning", "Insufficient balance")
+      return
+    }
+
+    setIsPlacingBet(true)
+
+    try {
+      showToast("warning", "Please confirm the transaction in MetaMask...")
+
+      const isFanToken = betCurrency !== "CHZ"
+      const betData = {
+        amount: betAmount,
+        isFanToken,
+        teamSelection: selectedTeam as 'home' | 'away',
+        currency: betCurrency,
+      }
+
+      const tx = await placeBetContract(betData)
+      
+      showToast("warning", `Transaction submitted! Hash: ${tx.hash.slice(0, 10)}...`)
+
+      // Wait for transaction confirmation
+      const receipt = await tx.wait()
+      
+      if (receipt.status === 1) {
+        showToast("success", 
+          `Bet placed successfully! ${betAmount} ${betCurrency} on ${selectedTeam === "home" ? selectedMatch.homeTeam : selectedMatch.awayTeam}`
+        )
+        
+        // Reset form
+        setBetAmount("")
+        setSelectedTeam("")
+        setSelectedMatch(null)
+        setBetCurrency("")
+      } else {
+        showToast("error", "Transaction failed")
+      }
+    } catch (error: any) {
       console.error("Error placing bet:", error)
-      showToast("error", "Failed to place bet")
+      
+      if (error.code === 4001) {
+        showToast("warning", "Transaction cancelled by user")
+      } else if (error.message?.includes("insufficient funds")) {
+        showToast("error", "Insufficient funds for transaction")
+      } else if (error.message?.includes("user rejected")) {
+        showToast("warning", "Transaction rejected by user")
+      } else {
+        showToast("error", `Failed to place bet: ${error.message || "Unknown error"}`)
+      }
+    } finally {
+      setIsPlacingBet(false)
     }
   }
 
@@ -624,18 +675,45 @@ export default function BettingPage() {
                   <div className="relative">
                     <div className="absolute inset-0 transform skew-x-2 rounded-lg" style={{ backgroundColor: '#FA014D' }}></div>
                     <Button
-                      onClick={isConnected ? placeBet : connectWallet}
+                      onClick={isConnected ? placeBet : handleConnectWallet}
                       className="relative w-full text-white hover:opacity-90 h-14 text-lg font-bold border-2 transition-all duration-300 shadow-lg"
                       style={{ 
                         backgroundColor: '#FA014D',
                         borderColor: '#FA014D'
                       }}
-                      disabled={isConnected && (!betAmount || !selectedTeam)}
+                      disabled={isConnected && (!betAmount || !selectedTeam || isPlacingBet)}
                     >
                       <Zap className="w-5 h-5 mr-2" />
-                      {isConnected ? "CONFIRM BET WITH METAMASK" : "CONNECT WALLET"}
+                      {isPlacingBet 
+                        ? "PLACING BET..." 
+                        : isConnected 
+                        ? "CONFIRM BET WITH METAMASK" 
+                        : "CONNECT WALLET"
+                      }
                     </Button>
                   </div>
+
+                  {/* Network and Balance Info */}
+                  {isConnected && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white/20 backdrop-blur-sm p-4 rounded-lg border border-white/30">
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-black/80">Wallet:</span>
+                          <span className="font-mono text-black">{account?.slice(0, 6)}...{account?.slice(-4)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-black/80">Balance:</span>
+                          <span className="font-mono text-black">{parseFloat(balance).toFixed(4)} ETH</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-black/80">Network:</span>
+                          <span className={`font-mono ${chainId === 31337 ? 'text-green-600' : 'text-red-600'}`}>
+                            {chainId === 31337 ? 'Localhost Hardhat ✓' : `Chain ${chainId} ✗`}
+                          </span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
                 </div>
               ) : (
                 <div className="text-center py-16">

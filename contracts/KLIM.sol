@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract KLIM is Ownable, ReentrancyGuard {
+contract GOGO is Ownable, ReentrancyGuard {
     
     struct Bet {
         uint256 amount;

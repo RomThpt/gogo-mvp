@@ -58,15 +58,15 @@ const MATCHES = [
 const USERS = new Map();
 
 // Contract configuration
-const KLIM_CONTRACT_ADDRESS =
-    localConfig.KLIM_CONTRACT_ADDRESS ||
-    process.env.KLIM_CONTRACT_ADDRESS ||
+const GOGO_CONTRACT_ADDRESS =
+    localConfig.GOGO_CONTRACT_ADDRESS ||
+    process.env.GOGO_CONTRACT_ADDRESS ||
     "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 const PRIVATE_KEY = localConfig.PRIVATE_KEY || process.env.PRIVATE_KEY;
 const RPC_URL =
     localConfig.RPC_URL || process.env.RPC_URL || "http://localhost:8545";
 
-const KLIM_ABI = [
+const GOGO_ABI = [
     "function placeBet(address user, uint256 amount, bool isFanToken) external payable",
     "function processResult(address user, uint256 betId, bool win) external",
     "function getUserBets(address user) external view returns (tuple(uint256 amount, bool isFanToken, uint256 timestamp, bool processed, bool won, uint256 payout)[])",
@@ -84,7 +84,7 @@ const KLIM_ABI = [
 let provider, contract, ownerWallet;
 try {
     provider = new ethers.JsonRpcProvider(RPC_URL);
-    contract = new ethers.Contract(KLIM_CONTRACT_ADDRESS, KLIM_ABI, provider);
+    contract = new ethers.Contract(GOGO_CONTRACT_ADDRESS, GOGO_ABI, provider);
 
     // Initialize owner wallet for admin functions
     if (PRIVATE_KEY) {
@@ -92,7 +92,7 @@ try {
         contract = contract.connect(ownerWallet);
     }
 
-    console.log("✅ Connected to KLIM contract at:", KLIM_CONTRACT_ADDRESS);
+    console.log("✅ Connected to GOGO contract at:", GOGO_CONTRACT_ADDRESS);
 } catch (error) {
     console.log(
         "⚠️ Running in mock mode - no blockchain connection:",
@@ -495,11 +495,11 @@ app.get("/api/contract/info", async (req, res) => {
     try {
         if (contract) {
             const contractBalance = await provider.getBalance(
-                KLIM_CONTRACT_ADDRESS
+                GOGO_CONTRACT_ADDRESS
             );
 
             const info = {
-                address: KLIM_CONTRACT_ADDRESS,
+                address: GOGO_CONTRACT_ADDRESS,
                 balance: parseFloat(ethers.formatEther(contractBalance)),
                 network: RPC_URL,
                 isConnected: true,
@@ -508,7 +508,7 @@ app.get("/api/contract/info", async (req, res) => {
             res.json(info);
         } else {
             res.json({
-                address: KLIM_CONTRACT_ADDRESS,
+                address: GOGO_CONTRACT_ADDRESS,
                 balance: 0,
                 network: "disconnected",
                 isConnected: false,
@@ -587,7 +587,7 @@ app.get("/health", (req, res) => {
         status: "OK",
         timestamp: new Date().toISOString(),
         contract: {
-            address: KLIM_CONTRACT_ADDRESS,
+            address: GOGO_CONTRACT_ADDRESS,
             connected: !!contract,
         },
     });
@@ -596,7 +596,7 @@ app.get("/health", (req, res) => {
 app.listen(PORT, () => {
     console.log(`🚀 GOGO Backend running on port ${PORT}`);
     console.log(`📊 Matches loaded: ${MATCHES.length}`);
-    console.log(`🔗 Contract: ${KLIM_CONTRACT_ADDRESS}`);
+    console.log(`🔗 Contract: ${GOGO_CONTRACT_ADDRESS}`);
     console.log(`🌐 Network: ${RPC_URL}`);
     console.log(
         `⚡ Contract interaction: ${

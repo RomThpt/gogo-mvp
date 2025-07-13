@@ -1,21 +1,21 @@
 const hre = require("hardhat");
 
 async function main() {
-    console.log("🧪 Testing KLIM Contract Functionality");
+    console.log("🧪 Testing GOGO Contract Functionality");
     console.log("=====================================\n");
 
     // Get signers
     const [owner, user1, user2] = await hre.ethers.getSigners();
 
-    // Deploy KLIM contract
-    console.log("📦 Deploying KLIM contract...");
-    const KLIM = await hre.ethers.getContractFactory("KLIM");
+    // Deploy GOGO contract
+    console.log("📦 Deploying GOGO contract...");
+    const GOGO = await hre.ethers.getContractFactory("GOGO");
     const treasury = owner.address;
-    const klim = await KLIM.deploy(treasury);
-    await klim.waitForDeployment();
+    const GOGO = await GOGO.deploy(treasury);
+    await GOGO.waitForDeployment();
 
-    const contractAddress = await klim.getAddress();
-    console.log("✅ KLIM deployed to:", contractAddress);
+    const contractAddress = await GOGO.getAddress();
+    console.log("✅ GOGO deployed to:", contractAddress);
     console.log("🏦 Treasury:", treasury);
 
     // Add funds to contract for payouts
@@ -39,13 +39,13 @@ async function main() {
         `💰 User1 placing bet: ${hre.ethers.formatEther(betAmount)} CHZ`
     );
 
-    await klim
-        .connect(user1)
-        .placeBet(user1.address, betAmount, true, { value: betAmount });
+    await GOGO.connect(user1).placeBet(user1.address, betAmount, true, {
+        value: betAmount,
+    });
     console.log("✅ Bet placed successfully");
 
     // Check user bets
-    const userBets = await klim.getUserBets(user1.address);
+    const userBets = await GOGO.getUserBets(user1.address);
     console.log(`📊 User1 has ${userBets.length} bet(s)`);
     console.log(
         `   - Amount: ${hre.ethers.formatEther(userBets[0].amount)} CHZ`
@@ -63,17 +63,17 @@ async function main() {
         `💼 User1 balance before: ${hre.ethers.formatEther(initialBalance)} CHZ`
     );
 
-    await klim.connect(owner).processResult(user1.address, 0, false); // bet loses
+    await GOGO.connect(owner).processResult(user1.address, 0, false); // bet loses
     console.log("✅ Bet processed as LOSS");
 
     // Check freebets generated
-    const freebets = await klim.getUserFreebets(user1.address);
+    const freebets = await GOGO.getUserFreebets(user1.address);
     console.log(
         `🎁 Freebets generated: ${hre.ethers.formatEther(freebets)} CHZ`
     );
 
     // Check claimable positions
-    const positions = await klim.getUserPositions(user1.address);
+    const positions = await GOGO.getUserPositions(user1.address);
     console.log(`📈 Staking positions: ${positions.length}`);
     if (positions.length > 0) {
         console.log(
@@ -86,7 +86,7 @@ async function main() {
         );
     }
 
-    const claimableAmount = await klim.getClaimableAmount(user1.address);
+    const claimableAmount = await GOGO.getClaimableAmount(user1.address);
     console.log(
         `💎 Total claimable: ${hre.ethers.formatEther(claimableAmount)} CHZ`
     );
@@ -97,9 +97,9 @@ async function main() {
     console.log("-----------------------------------");
 
     const winBetAmount = hre.ethers.parseEther("0.5");
-    await klim
-        .connect(user2)
-        .placeBet(user2.address, winBetAmount, false, { value: winBetAmount });
+    await GOGO.connect(user2).placeBet(user2.address, winBetAmount, false, {
+        value: winBetAmount,
+    });
     console.log(
         `💰 User2 placing bet: ${hre.ethers.formatEther(winBetAmount)} CHZ`
     );
@@ -113,7 +113,7 @@ async function main() {
         )} CHZ`
     );
 
-    await klim.connect(owner).processResult(user2.address, 0, true); // bet wins
+    await GOGO.connect(owner).processResult(user2.address, 0, true); // bet wins
     console.log("✅ Bet processed as WIN");
 
     const user2BalanceAfter = await hre.ethers.provider.getBalance(
@@ -125,7 +125,7 @@ async function main() {
         )} CHZ`
     );
 
-    const user2Bets = await klim.getUserBets(user2.address);
+    const user2Bets = await GOGO.getUserBets(user2.address);
     console.log(
         `🏆 Payout: ${hre.ethers.formatEther(user2Bets[0].payout)} CHZ`
     );
@@ -136,14 +136,14 @@ async function main() {
     console.log("-------------------------------------");
 
     const additionalFreebets = hre.ethers.parseEther("0.3");
-    await klim.connect(owner).mintFreebets(user1.address, additionalFreebets);
+    await GOGO.connect(owner).mintFreebets(user1.address, additionalFreebets);
     console.log(
         `🎁 Minted ${hre.ethers.formatEther(
             additionalFreebets
         )} CHZ freebets for User1`
     );
 
-    const totalFreebets = await klim.getUserFreebets(user1.address);
+    const totalFreebets = await GOGO.getUserFreebets(user1.address);
     console.log(
         `💰 User1 total freebets: ${hre.ethers.formatEther(totalFreebets)} CHZ`
     );
@@ -155,7 +155,7 @@ async function main() {
 
     // In a real scenario, we would need to fast-forward time
     // For now, we'll just show the available positions
-    const availablePositions = await klim.getUserAvailablePositions(
+    const availablePositions = await GOGO.getUserAvailablePositions(
         user1.address
     );
     console.log(
